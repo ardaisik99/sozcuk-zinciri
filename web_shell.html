@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+<meta name="theme-color" content="#faf7f0">
+<meta name="description" content="Bir sözcükten yeni bir keşfe. Türkçe kelime zincirlerini tamamla, bağlantıları bul, arkadaşlarınla yan yana oyna.">
+<title>Sözcük Zinciri — Kelimeler birleşir, keşif başlar.</title>
+$GODOT_HEAD_INCLUDE
+<style>
+@font-face{font-family:Nunito;src:url('Nunito.ttf') format('truetype');font-display:swap;font-weight:400 900}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#efeaf3;color:#35264c;font-family:Nunito,system-ui,sans-serif}
+body{display:flex;align-items:center;justify-content:center}#stage{position:relative;width:min(100%,480px);height:100%;height:100dvh;background:#faf7f0;overflow:hidden}
+#canvas{display:block;width:100%;height:100%;outline:none;touch-action:pan-y}#status{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;background:#faf7f0;text-align:center}
+#status img{width:180px;height:180px;object-fit:contain}h1{font-size:44px;line-height:1.02;letter-spacing:-1.5px;margin:15px 0;color:#35264c;font-weight:900}#tagline{font-size:16px;color:#81758e;line-height:1.6;margin:8px 0 40px}.track{width:180px;height:6px;border-radius:9px;background:#e5dcf1;overflow:hidden}#fill{width:0;height:100%;background:#7654bf;transition:width .2s}#detail{margin:15px 0;color:#81758e;font-size:13px}#retry{border:0;border-radius:16px;background:#7654bf;color:white;font:800 16px Nunito;padding:14px 22px;margin:14px;cursor:pointer}#error{font-size:14px;line-height:1.6;max-width:330px;color:#a65d51;white-space:pre-line}
+.desktop-note{position:fixed;left:max(36px,calc(50% - 590px));top:50%;transform:translateY(-50%);width:230px}.desktop-note small{font-size:11px;letter-spacing:2px;color:#88749d;font-weight:900}.desktop-note h2{font-size:36px;line-height:1.15;letter-spacing:-1px}.desktop-note p{font-size:15px;line-height:1.8;color:#81758e}.desktop-note span{display:inline-block;border:1px solid #d2c5e1;padding:8px 14px;border-radius:20px;font-size:12px;color:#7654bf}.corner{position:fixed;bottom:28px;right:32px;font-size:12px;color:#998da5}
+#native-fields{position:absolute;inset:0;z-index:10;overflow:hidden;pointer-events:none}.word-input{position:absolute;pointer-events:auto;background:white;color:#35264c;border:1px solid #e2d9ed;border-radius:16px;font:500 18px Nunito,system-ui,sans-serif;padding:10px 16px;outline:none;box-shadow:none;min-height:42px}.word-input:focus{border:2px solid #7654bf}.word-input::placeholder{color:#81758e;opacity:1}
+@media(max-width:1050px){.desktop-note,.corner{display:none}}@media(min-width:600px){#stage{border-left:1px solid #e4dbea;border-right:1px solid #e4dbea}}@media(prefers-reduced-motion:reduce){#fill{transition:none}}
+</style>
+</head>
+<body>
+<aside class="desktop-note" aria-hidden="true"><small>BİR KELİMEYLE BAŞLA</small><h2>Küçük bir mola.<br>Yepyeni bağlantılar.</h2><p>Kelimelerin birbirine açıldığı<br>küçük, rengârenk bir dünya.</p><span>Türkçe kelime bulmaca</span></aside>
+<main id="stage">
+<canvas id="canvas" tabindex="0" aria-label="Sözcük Zinciri oyunu">Bu oyunu oynamak için WebGL 2 destekli bir tarayıcı gerekiyor.</canvas>
+<div id="native-fields"></div>
+<div id="status" role="status" aria-live="polite"><img src="mascot.webp" width="180" height="180" alt="Mor kuş maskotu"><h1>Sözcük<br>Zinciri</h1><p id="tagline">Kelimeler birleşir, keşif başlar.</p><div class="track"><div id="fill"></div></div><p id="detail">Kelimeler yerini alıyor…</p><p id="error" hidden></p><button id="retry" hidden onclick="location.reload()">Yeniden dene</button></div>
+</main><div class="corner" aria-hidden="true">Sözcük Zinciri · 2026</div>
+<script src="$GODOT_URL"></script>
+<script>
+const config=$GODOT_CONFIG;
+// GitHub Pages has no configurable compression headers. Stream-decompress
+// the precompressed engine without buffering a second full WASM in JS.
+const originalFetch=window.fetch.bind(window);
+if('DecompressionStream' in window){window.fetch=async function(input,options){const url=typeof input==='string'?input:input instanceof URL?input.href:null;if(url&&url.split('?')[0].endsWith('index.wasm')){try{const r=await originalFetch(url+'.gz',options);if(r.ok)return new Response(r.body.pipeThrough(new DecompressionStream('gzip')),{headers:{'Content-Type':'application/wasm'}});}catch(e){console.warn('Sıkıştırılmış motor yüklenemedi, standart dosya kullanılacak.');}}return originalFetch(input,options);};}
+config.canvasResizePolicy=0;
+const canvas=document.getElementById('canvas');
+const stage=document.getElementById('stage');
+function fitCanvas(){const dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.round(stage.clientWidth*dpr);canvas.height=Math.round(stage.clientHeight*dpr);}
+fitCanvas();
+new ResizeObserver(fitCanvas).observe(stage);
+window.wordInput={changed:null,fields:new Map(),add(id,value,placeholder,max){const e=document.createElement('input');e.className='word-input';e.type='text';e.value=value;e.placeholder=placeholder;e.maxLength=max;e.autocomplete='off';e.setAttribute('autocorrect','off');e.setAttribute('autocapitalize','off');e.spellcheck=false;e.enterKeyHint='done';e.setAttribute('aria-label',placeholder);e.addEventListener('input',()=>this.changed?.(id,e.value,'change'));e.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.isComposing){event.preventDefault();this.changed?.(id,e.value,'submit');}});document.getElementById('native-fields').appendChild(e);this.fields.set(id,e);},position(id,x,y,w,h){const e=this.fields.get(id);if(!e)return;Object.assign(e.style,{left:(x*stage.clientWidth)+'px',top:(y*stage.clientHeight)+'px',width:(w*stage.clientWidth)+'px',height:(h*stage.clientHeight)+'px',fontSize:Math.max(16,h*stage.clientHeight*.345)+'px'});},blur(){this.fields.forEach(e=>e.blur());},close(){this.fields.forEach(e=>e.remove());this.fields.clear();}};
+const engine=new Engine(config);
+const status=document.getElementById('status'),detail=document.getElementById('detail'),fill=document.getElementById('fill');
+function fail(err){document.getElementById('error').hidden=false;document.getElementById('error').textContent='Oyun yüklenemedi. Bağlantını kontrol edip tekrar deneyebilirsin.\n'+(err?.message||String(err));document.getElementById('retry').hidden=false;detail.textContent='Küçük bir bağlantı molası.';console.error(err)}
+const missing=Engine.getMissingFeatures({threads:false});
+if(missing.length){fail(new Error('Bu tarayıcıda WebGL 2 / WebAssembly desteği gerekli.'));}else{
+engine.startGame({onProgress:(loaded,total)=>{if(total>0){let p=Math.min(100,Math.round(loaded/total*100));fill.style.width=p+'%';detail.textContent=p<100?'Kelimeler hazırlanıyor · %'+p:'Son bağlantılar kuruluyor…';}}}).then(()=>{status.remove();document.getElementById('canvas').focus();}).catch(fail);
+}
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&document.activeElement?.tagName==='INPUT')document.activeElement.blur()});
+</script>
+</body></html>

@@ -1,0 +1,8 @@
+.godot/
+.tools/
+web/*
+!web/.gdignore
+!web/.nojekyll
+output/
+tests/screenshots/
+*.tmp
