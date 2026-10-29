@@ -63,8 +63,10 @@ func _ready() -> void:
 	OS.low_processor_usage_mode = true
 	OS.low_processor_usage_mode_sleep_usec = 0 if OS.has_feature("web") else 33000
 	get_viewport().disable_3d = true
-	PhysicsServer2D.set_active(false)
-	PhysicsServer3D.set_active(false)
+	# The small web template omits physics entirely; native editor builds
+	# still disable their installed physics singletons while this UI runs.
+	for server_name in ["PhysicsServer2D","PhysicsServer3D"]:
+		if Engine.has_singleton(server_name): Engine.get_singleton(server_name).call("set_active",false)
 	get_window().size_changed.connect(_adapt_scale)
 	_adapt_scale()
 	var source_font = load("res://assets/Nunito.ttf")

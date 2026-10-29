@@ -1,27 +1,65 @@
-"""Prepare static Pages assets; no Python dependency beyond stdlib."""
+"""Content-addressed web assets, compressed parallel transport, inline first paint."""
 from pathlib import Path
 import gzip
 import shutil
 import hashlib
+import base64
+import json
 
 root = Path(__file__).resolve().parent.parent
 web = root / "web"
-for legacy in ("mascot.webp", "mascot.webp.import", "splash.webp", "logo_dark.webp"):
-    old = web / legacy
-    if old.is_file(): old.unlink()
-shutil.copyfile(root / "assets" / "Nunito.ttf", web / "Nunito.ttf")
-shutil.copyfile(root / "assets" / "v4" / "landscape.webp", web / "landscape.webp")
-shutil.copyfile(root / "scripts" / "web_input.js", web / "word-input.js")
-shutil.copyfile(root / "scripts" / "benchmark.js", web / "benchmark.js")
-shutil.copyfile(root / "scripts" / "frame_pacer.js", web / "frame-pacer.js")
-build_id = hashlib.sha256((web / "index.pck").read_bytes()).hexdigest()[:12]
-html = web / "index.html"
-html.write_text(html.read_text(encoding="utf-8").replace("__BUILD_ID__",build_id),encoding="utf-8")
-(web / ".nojekyll").touch()
-licenses = ["FONT-LICENSE.txt", "SYMBOLS-LICENSE.txt", "GODOT-LICENSE.txt"]
-(web / "third-party-licenses.txt").write_text("\n\n".join((root / "assets" / name).read_text(encoding="utf-8") for name in licenses), encoding="utf-8")
-wasm = web / "index.wasm"
-compressed = gzip.compress(wasm.read_bytes(), compresslevel=9, mtime=0)
-(web / "index.wasm.gz").write_bytes(compressed)
-print(f"Engine: {wasm.stat().st_size:,} bytes raw / {len(compressed):,} bytes gzip")
-print(f"Game pack: {(web / 'index.pck').stat().st_size:,} bytes")
+sha = lambda data: hashlib.sha256(data).hexdigest()
+wasm = (web / "index.wasm").read_bytes()
+engine_js = (web / "index.js").read_bytes()
+pack = (web / "index.pck").read_bytes()
+engine_id = sha(wasm+engine_js)[:16]
+pack_id = sha(pack)[:16]
+runtime_base = f"runtime-{engine_id}"
+pack_path = f"game-{pack_id}.pck"
+boot = "\n;\n".join((root/"scripts"/name).read_text(encoding="utf-8") for name in
+                      ("benchmark.js","frame_pacer.js","web_input.js","asset_loader.js","start_game.js"))
+boot_name = f"boot-{sha(boot.encode())[:16]}.js"
+assets=[]
+def asset(name,path,data,mime):
+    compressed=gzip.compress(data,compresslevel=9,mtime=0)
+    (web/path).write_bytes(data)
+    (web/(path+".gz")).write_bytes(compressed)
+    result={"name":name,"url":path,"gzip":path+".gz","size":len(data),"gzipSize":len(compressed),
+            "hash":sha(data),"gzipHash":sha(compressed),"mime":mime}
+    assets.append(result)
+    return result
+engine=asset("runtime",runtime_base+".wasm",wasm,"application/wasm")
+game=asset("game",pack_path,pack,"application/octet-stream")
+(web/(runtime_base+".js")).write_bytes(engine_js)
+(web/boot_name).write_text(boot,encoding="utf-8")
+# Keep exported index.* aliases during the migration so a previously cached
+# HTML document can still retrieve its fixed engine/pack paths.
+(web/"index.wasm.gz").write_bytes((web/(runtime_base+".wasm.gz")).read_bytes())
+shutil.copyfile(root/"assets/Nunito.ttf",web/"Nunito.ttf")
+shutil.copyfile(root/"assets/v4/landscape.webp",web/"landscape.webp")
+for source,target in [("web_input.js","word-input.js"),("frame_pacer.js","frame-pacer.js"),("benchmark.js","benchmark.js")]:
+    shutil.copyfile(root/"scripts"/source,web/target)
+filesizes={a["url"]:a["size"] for a in assets}
+replacements={"__INLINE_FONT__":"data:font/woff2;base64,"+base64.b64encode((root/"assets/NunitoUI.woff2").read_bytes()).decode(),
+              "__INLINE_LANDSCAPE__":"data:image/webp;base64,"+base64.b64encode((root/"assets/v4/landscape.webp").read_bytes()).decode(),
+              "__ASSETS_MANIFEST__":json.dumps(assets,separators=(",",":")),
+              "__RUNTIME_BASE__":runtime_base,"__PACK_PATH__":pack_path,"__FILE_SIZES__":json.dumps(filesizes),
+              "__RUNTIME_JS__":runtime_base+".js","__BOOT_JS__":boot_name}
+html=web/"index.html"
+contents=html.read_text(encoding="utf-8")
+for key,value in replacements.items(): contents=contents.replace(key,value)
+assert not any(key in contents for key in replacements),"Unresolved web shell placeholders"
+html.write_text(contents,encoding="utf-8")
+keep={a["url"] for a in assets}|{a["gzip"] for a in assets}|{runtime_base+".js",boot_name}
+for pattern in ("runtime-*","game-*.pck*","boot-*.js"):
+    for old in web.glob(pattern):
+        if old.is_file() and old.name not in keep: old.unlink()
+(web/".nojekyll").touch()
+licenses=["FONT-LICENSE.txt","SYMBOLS-LICENSE.txt","GODOT-LICENSE.txt"]
+(web/"third-party-licenses.txt").write_text("\n\n".join((root/"assets"/name).read_text(encoding="utf-8") for name in licenses),encoding="utf-8")
+metrics={"assets":assets,"htmlBytes":html.stat().st_size,"htmlGzipBytes":len(gzip.compress(contents.encode(),mtime=0)),
+         "bootBytes":len(boot.encode()),"runtimeJsBytes":len(engine_js),"firstDownloadCompressedBytes":sum(a["gzipSize"] for a in assets)}
+(web/"sizes.json").write_text(json.dumps(metrics,indent=2),encoding="utf-8")
+print(f"Engine: {len(wasm):,} bytes raw / {engine['gzipSize']:,} bytes gzip")
+print(f"Game pack: {len(pack):,} bytes raw / {game['gzipSize']:,} bytes gzip")
+print(f"First paint: inline art/font; HTML gzip {metrics['htmlGzipBytes']:,} bytes")

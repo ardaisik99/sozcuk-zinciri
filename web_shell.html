@@ -8,7 +8,7 @@
 <title>Sözcük Zinciri</title>
 $GODOT_HEAD_INCLUDE
 <style>
-@font-face{font-family:Nunito;src:url('Nunito.ttf');font-display:swap;font-weight:400 900}
+@font-face{font-family:Nunito;src:url('__INLINE_FONT__');font-display:swap;font-weight:400 900}
 *{box-sizing:border-box;scrollbar-width:none}*::-webkit-scrollbar{display:none}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#425fb2;color:#172967;font-family:Nunito,system-ui,sans-serif;overscroll-behavior:none}
 body{display:flex;align-items:center;justify-content:center}
@@ -18,7 +18,7 @@ body{display:flex;align-items:center;justify-content:center}
 #native-fields{position:absolute;inset:0;z-index:10;overflow:hidden;overflow:clip;pointer-events:none}
 .word-input{position:absolute;pointer-events:auto;background:transparent;border:0;outline:0;box-shadow:none;color:transparent;caret-color:#6038ef;font:500 18px Nunito,system-ui,sans-serif;padding:10px 16px;min-width:0;border-radius:20px;touch-action:pan-y}
 .word-input::placeholder{color:transparent}.word-input::selection{color:transparent;background:#c9bbff55}.word-input.tiles{opacity:.001;caret-color:transparent;padding:0}
-#status{position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:38px;text-align:center;color:white;background:#697fd3 url('landscape.webp') center/cover no-repeat}
+#status{position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:38px;text-align:center;color:white;background:#697fd3 url('__INLINE_LANDSCAPE__') center/cover no-repeat}
 #status h1{font-size:58px;font-weight:900;line-height:.98;letter-spacing:-2px;margin:0 0 95px;text-shadow:0 3px 1px #303d7955}
 .track{width:180px;height:6px;background:#8671cb77;border-radius:8px;overflow:hidden}#fill{height:100%;width:0;background:#fff;border-radius:8px;transition:width .2s}#detail{font-size:13px;color:#e5dcff;line-height:1.6;margin-top:15px}
 #retry{border:0;border-radius:20px;background:#ffca58;color:#302074;font:900 16px Nunito;padding:14px 24px;cursor:pointer}#error{font-size:14px;line-height:1.7;max-width:320px;white-space:pre-line;color:#ffe8ac}
@@ -33,29 +33,10 @@ body{display:flex;align-items:center;justify-content:center}
 <div id="native-fields"></div>
 <div id="status" role="status" aria-live="polite"><h1>Sözcük<br>Zinciri</h1><div class="track"><div id="fill"></div></div><p id="detail">Kelimeler hazırlanıyor…</p><p id="error" hidden></p><button id="retry" hidden onclick="location.reload()">Yeniden Dene</button></div>
 </main>
-<script src="benchmark.js"></script>
-<script src="frame-pacer.js?v=__BUILD_ID__"></script>
-<script src="word-input.js?v=__BUILD_ID__"></script>
-<script src="$GODOT_URL"></script>
 <script>
-const config=$GODOT_CONFIG;
-config.args=(config.args||[]).concat(['--audio-driver','Dummy']);
-const buildId='__BUILD_ID__';
-const originalFetch=window.fetch.bind(window);
-window.fetch=async function(input,options){
- const url=typeof input==='string'?input:input instanceof URL?input.href:null;
- if(url&&url.split('?')[0].endsWith('index.pck')) return originalFetch(url+'?v='+buildId,options);
- if(url&&url.split('?')[0].endsWith('index.wasm')&&'DecompressionStream'in window){try{const r=await originalFetch(url+'.gz',options);if(r.ok)return new Response(r.body.pipeThrough(new DecompressionStream('gzip')),{headers:{'Content-Type':'application/wasm'}});}catch(e){console.warn('Standart motor dosyası kullanılacak.');}}
- return originalFetch(input,options);
-};
-config.canvasResizePolicy=0;
-const canvas=document.getElementById('canvas'),stage=document.getElementById('stage');
-function fitCanvas(){const dpr=Math.min(window.devicePixelRatio||1,2),w=Math.round(stage.clientWidth*dpr),h=Math.round(stage.clientHeight*dpr);if(canvas.width!==w)canvas.width=w;if(canvas.height!==h)canvas.height=h;}
-fitCanvas();new ResizeObserver(fitCanvas).observe(stage);
-const engine=new Engine(config),status=document.getElementById('status'),detail=document.getElementById('detail'),fill=document.getElementById('fill');
-function fail(error){document.getElementById('error').hidden=false;document.getElementById('error').textContent='Oyun yüklenemedi. Bağlantını kontrol edip tekrar dene.\n'+(error?.message||String(error));document.getElementById('retry').hidden=false;detail.textContent='Kısa bir bağlantı molası.';console.error(error);}
-if(Engine.getMissingFeatures({threads:false}).length){fail(new Error('WebGL 2 ve WebAssembly desteği gerekiyor.'));}
-else engine.startGame({onProgress:(loaded,total)=>{if(total>0){const p=Math.min(100,Math.round(loaded/total*100));fill.style.width=p+'%';detail.textContent=p<100?'Yükleniyor… %'+p:'Son bağlantılar kuruluyor…';}}}).then(()=>{status.remove();canvas.focus();}).catch(fail);
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&document.activeElement?.tagName==='INPUT')document.activeElement.blur();});
+window.SozcukBuild={config:$GODOT_CONFIG,assets:__ASSETS_MANIFEST__};
+Object.assign(window.SozcukBuild.config,{executable:'__RUNTIME_BASE__',mainPack:'__PACK_PATH__',fileSizes:__FILE_SIZES__});
 </script>
+<script src="__RUNTIME_JS__" defer></script>
+<script src="__BOOT_JS__" defer></script>
 </body></html>

@@ -8,8 +8,8 @@ godot = sys.argv[1] if len(sys.argv) > 1 else "godot"
 commands = [[godot,"--headless","--path",str(root),"--script",script]
             for script in ("tests/test_state.gd","tests/test_flows.gd")]
 commands += [["node","--check",str(root/"scripts"/file)]
-             for file in ("web_input.js","frame_pacer.js","benchmark.js")]
-commands += [["node",str(root/"tests/test_frame_pacer.cjs")]]
+             for file in ("web_input.js","frame_pacer.js","benchmark.js","asset_loader.js","start_game.js")]
+commands += [["node",str(root/script)] for script in ("tests/test_frame_pacer.cjs","tests/test_asset_loader.cjs")]
 for command in commands:
     try:
         result = subprocess.run(command,cwd=root,stdout=subprocess.PIPE,
