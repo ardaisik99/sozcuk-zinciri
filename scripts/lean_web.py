@@ -1,0 +1,23 @@
+"""Godot 4.7.2 export template for this Control-only Turkish word game."""
+platform = "web"
+target = "template_release"
+production = True
+threads = False
+optimize = "size_extra"
+lto = "thin"
+disable_3d = True
+disable_advanced_gui = True
+disable_physics_2d = True
+disable_physics_3d = True
+disable_navigation_2d = True
+disable_navigation_3d = True
+disable_xr = True
+modules_enabled_by_default = False
+module_gdscript_enabled = True
+module_freetype_enabled = True
+module_text_server_fb_enabled = True
+module_webp_enabled = True
+brotli = False
+minizip = False
+deprecated = False
+debug_symbols = False

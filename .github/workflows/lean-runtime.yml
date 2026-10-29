@@ -1,0 +1,44 @@
+name: Build small Godot Web runtime
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: godotengine/godot
+          ref: 4.7.2-stable
+          path: engine
+      - name: Install Emscripten 4.0.11
+        run: |
+          python3 -m pip install scons
+          git clone --depth 1 https://github.com/emscripten-core/emsdk.git /tmp/emsdk
+          /tmp/emsdk/emsdk install 4.0.11
+          /tmp/emsdk/emsdk activate 4.0.11
+      - uses: actions/cache@v4
+        with:
+          path: /tmp/scons-cache
+          key: godot-4.7.2-web-4.0.11-${{ hashFiles('scripts/lean_web.py') }}
+      - name: Compile only the game features
+        working-directory: engine
+        env:
+          SCONS_CACHE: /tmp/scons-cache
+        run: |
+          source /tmp/emsdk/emsdk_env.sh
+          scons --jobs=2 profile=../scripts/lean_web.py
+          sha256sum bin/godot.web.template_release.wasm32.nothreads.zip
+          git rev-parse HEAD > bin/godot-revision.txt
+          cp ../scripts/lean_web.py bin/lean_web.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lean-web-4.7.2
+          path: |
+            engine/bin/godot.web.template_release.wasm32.nothreads.zip
+            engine/bin/godot-revision.txt
+            engine/bin/lean_web.py
+          retention-days: 90
