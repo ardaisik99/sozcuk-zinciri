@@ -1,0 +1,52 @@
+{
+  "before": {
+    "start": {
+      "elapsedMs": 17034,
+      "callbacks": 493,
+      "callbackMs": 16051.9,
+      "clears": 491,
+      "draws": 15809
+    },
+    "end": {
+      "elapsedMs": 118066,
+      "callbacks": 3524,
+      "callbackMs": 116328.3,
+      "clears": 3522,
+      "draws": 115832,
+      "longTasks": 1,
+      "longTaskMs": 578,
+      "width": 390,
+      "height": 844
+    },
+    "mainThreadBusyPct": 99.25211814078708,
+    "clearsPerSecond": 30.000395914165807,
+    "drawsPerSecond": 990.0130651674717
+  },
+  "after": {
+    "start": {
+      "elapsedMs": 21014,
+      "callbacks": 253,
+      "callbackMs": 28,
+      "clears": 3,
+      "draws": 33,
+      "longTasks": 1,
+      "longTaskMs": 248,
+      "width": 390,
+      "height": 844
+    },
+    "end": {
+      "elapsedMs": 112012,
+      "callbacks": 1116,
+      "callbackMs": 120.7,
+      "clears": 3,
+      "draws": 33,
+      "longTasks": 1,
+      "longTaskMs": 248,
+      "width": 390,
+      "height": 844
+    },
+    "mainThreadBusyPct": 0.10187037077737972,
+    "clearsPerSecond": 0,
+    "drawsPerSecond": 0
+  }
+}

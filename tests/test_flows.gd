@@ -7,6 +7,7 @@ class MemoryState extends GameState:
 		return true
 
 func _initialize() -> void:
+	set_meta("test_mode",true)
 	call_deferred("run")
 
 func answer(game: Control, word: String) -> void:
@@ -21,6 +22,12 @@ func run() -> void:
 	memory.data.name = "Deneme"
 	memory.data.motion = false
 	game.state = memory
+	assert(int(game.levels[0].id) == 19)
+	assert(game.next_level_id() == 19)
+	memory.data.completed = [19]
+	assert(game.next_level_id() == 3)
+	memory.data.completed = []
+	for i in range(1,game.levels.size()): assert(game.levels[i-1].order < game.levels[i].order)
 	game.show_tutorial_intro()
 	game.start_level(1,"tutorial")
 	game.reveal_letter()
@@ -83,6 +90,16 @@ func run() -> void:
 	assert(game.screen == "party_turn_end")
 	game.show_party_results()
 	assert(game.screen == "party_results")
+	game.start_level(2)
+	game.revealed = [0,6]
+	answer(game,"incani")
+	assert(game.cursor == 2)
+	assert(game.current.words[1] == "FİNCAN")
+	memory.data.active.erase("2")
+	game.start_level(2)
+	game.revealed = [0,1,2,3,4,5,6]
+	answer(game,"")
+	assert(game.cursor == 2)
 	# Exercise the real debounced input + animated surface → stem transition.
 	memory.data.motion = true
 	game.start_level(1,"tutorial")

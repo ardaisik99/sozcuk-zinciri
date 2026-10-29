@@ -46,5 +46,50 @@ func _initialize() -> void:
 	assert(not WordRules.matches("kutuş",box,1))
 	assert(not WordRules.matches("deniz bardağı",levels[0],1))
 	assert(WordRules.display("ardağı","BARDAĞI",[0]) == "BARDAĞI")
+	# The reported FINCANI case: visible cells and acceptance must agree.
+	var coffee = levels[1]
+	assert(WordRules.resolve("incani",coffee,1,[0,6]).letters == "FİNCANI")
+	assert(WordRules.matches("incani",coffee,1,[0,6]))
+	assert(WordRules.matches("İNCANX",coffee,1,[0,6]))
+	assert(WordRules.matches("",coffee,1,[0,1,2,3,4,5,6]))
+	assert(WordRules.matches("fincani",coffee,1))
+	assert(WordRules.matches("fincanı",coffee,1))
+	assert(WordRules.matches("FI\u0307NCANI",coffee,1))
+	assert(not WordRules.matches("FİNCANIP",coffee,1))
+	var checked = 0
+	for level in levels:
+		for index in range(1,level.words.size()):
+			var surface: String = level.forms[index]
+			for bits in range(1 << (surface.length()-1)):
+				var mask: Array = [0]
+				var missing = ""
+				for i in range(1,surface.length()):
+					if bits & (1 << (i-1)): mask.append(i)
+					else: missing += surface[i]
+				for value in [surface,surface.substr(1),missing,level.words[index],surface+"X","", "YANLIŞ"]:
+					var resolved = WordRules.resolve(value,level,index,mask)
+					assert(WordRules.matches(value,level,index,mask) == resolved.accepted)
+					assert((resolved.letters == surface) == resolved.accepted)
+				assert(WordRules.matches(missing,level,index,mask))
+				checked += 1
+	var legacy = {"version":1,"content_version":2,"name":"Oyuncu","coins":5,"completed":[1],"active":{"2":{"cursor":1,"revealed":[0,1,2,3,4,5,6],"clues":{"1":true}}}}
+	var restored = MemoryState.new()
+	assert(restored.restore(legacy))
+	assert(restored.data.coins == 105)
+	var round_trip = MemoryState.new()
+	assert(not round_trip.restore(JSON.parse_string(JSON.stringify(restored.data))))
+	assert(1 in round_trip.data.completed)
+	assert(typeof(round_trip.data.completed[0]) == TYPE_INT)
+	assert(6 in round_trip.data.active["2"].revealed)
+	assert(restored.data.completed == [1])
+	assert(not restored.restore(restored.data.duplicate(true)))
+	assert(restored.data.coins == 105)
+	var orders: Array = []
+	for level in levels:
+		orders.append(int(level.order))
+		assert(level.difficulty == ("Kolay" if level.order <= 8 else "Orta" if level.order <= 16 else "Zor"))
+	orders.sort()
+	assert(orders == range(1,25))
+	print("PASS: "+str(checked)+" hint masks, full/rest/blank-only input, I variants, visible/accepted invariant, refund-once and difficulty ordering.")
 	print("PASS: Turkish casing, insufficient balance, 24 valid chains.")
 	quit()

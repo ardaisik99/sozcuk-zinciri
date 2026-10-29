@@ -13,6 +13,8 @@ shutil.copyfile(root / "assets" / "Nunito.ttf", web / "Nunito.ttf")
 for name in ("splash.webp", "logo_dark.webp"):
     shutil.copyfile(root / "assets" / "v2" / name, web / name)
 shutil.copyfile(root / "scripts" / "web_input.js", web / "word-input.js")
+shutil.copyfile(root / "scripts" / "benchmark.js", web / "benchmark.js")
+shutil.copyfile(root / "scripts" / "frame_pacer.js", web / "frame-pacer.js")
 build_id = hashlib.sha256((web / "index.pck").read_bytes()).hexdigest()[:12]
 html = web / "index.html"
 html.write_text(html.read_text(encoding="utf-8").replace("__BUILD_ID__",build_id),encoding="utf-8")

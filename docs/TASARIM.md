@@ -1,6 +1,6 @@
 # Sözcük Zinciri — Oyun tasarımı
 
-## Sürüm 2
+## Sürüm 3
 
 Godot 4.7.2, GDScript, Compatibility renderer. İlk teslim web içindir; Android ve iOS için dikey Control yerleşimi ve yerel klavye kullanımı korunur. Bu sürüm yalnızca Türkçedir.
 
@@ -10,11 +10,13 @@ Yükleme → kullanıcı adı → kısa açıklama → oynanabilir öğretici �
 
 24 editoryal bölüm, 3 kategori: Mutfak, Doğa, Günlük Yaşam. Bölümler 4 veya 5 sözcük içerir. Önceki sözcük ile sıradaki sözcük bir isim tamlaması veya yerleşik ifade oluşturur. Cevap doğrudan harf kutularına yazılır. İlk harfi tekrar yazmak gerekmez. Örneğin B hazırken ARDAĞI yazmak yeterlidir. Ekli biçim BARDAĞI, kısa bir harf animasyonuyla BARDAK köküne dönüşür ve sonraki bağlantı bardak altlığı olur. Tam ekli sözcük, yalnızca eksik devamı, yalın kök veya tam doğru tamlama kabul edilir. Keyfi ek kesilmez: bütün dönüşümler `forms` ve `words` alanlarında tanımlıdır.
 
-Doğru girişten 240 ms sonra doğrulama başlar. Harfler sırayla hafifçe büyür; ek harfleri kaybolur, yumuşamış harfler köke döner. Animasyon yaklaşık 600 ms sürer. Cevap alanı ve klavye odağı aynı kalır; sonraki kelime için tekrar dokunulmaz. Ayrı bir cevap kutusu ve kontrol düğmesi yoktur. Klavyenin gönder/ileri tuşu da doğrular. Animasyon tercihi kapalıysa dönüşüm anlıktır.
+Doğru girişten 180 ms sonra doğrulama başlar. Harfler sırayla hafifçe büyür; ek harfleri kaybolur, yumuşamış harfler köke döner. Animasyon yaklaşık 400 ms sürer. Cevap alanı ve klavye odağı aynı kalır; sonraki kelime için tekrar dokunulmaz. Ayrı bir cevap kutusu ve kontrol düğmesi yoktur. Klavyenin gönder/ileri tuşu da doğrular. Animasyon tercihi kapalıysa dönüşüm anlıktır.
+
+Kutuların çizimi ve cevap kontrolü aynı `WordRules.resolve` sonucunu kullanır. Jokerle dolu hücreler sabittir; sadece boş hücreler, ilk harften sonraki bölüm veya tam sözcük yazılabilir. i/ı ve birleşik/ayrışık noktalı I girişleri beklenen sözcüğe göre karşılaştırılır. Fazladan gizli harf kırpılıp doğru bir görünüm üretilmez; son düzenlenebilir kutuda taşma işareti gösterilir. 2.744 joker maskesi için görünen doğru sözcük ile kabul sonucunun tutarlılığı test edilir.
 
 İlk sözcük açık, sıradaki sözcüğün ilk harfi ve uzunluğu görünür. Sonraki kartlar, önceki kelimenin çözülmesini bekler. Hatalı tahminler altın veya can tüketmez. Türkçe i/İ ve ı/I dönüşümleri ayrı ele alınır. Başta ve sonda kalan boşluklar temizlenir; yanlış harfler otomatik olarak doğru cevaba dönüştürülmez.
 
-Her kategorinin ilk bölümü açıktır; diğerleri önceki bölümle açılır. Tamamlanmış bölümler tekrar oynanabilir. Ana menü henüz tamamlanmamış en erken bölüme ve varsa o bölümdeki kayıtlı tahmine ilerler.
+24 bölüm kolaydan zora sıralıdır: 1–8 Kolay, 9–16 Orta, 17–24 Zor. İlk bölüm EV → KAPI → ZİL → SES gibi gündelik bağlantılarla başlar; beş sözcüklü zincir en sondadır. Her kategorinin en kolay bölümü açıktır; diğerleri kategori içindeki önceki bölümle açılır. İçerik kimlikleri kalıcıdır, görünen bölüm numarası `order` alanından gelir. Bu nedenle sıralama değişikliği tamamlanan bulmacaları başka bulmacalara dönüştürmez. Ana menü en erken tamamlanmamış sıraya ilerler.
 
 ## Ekonomi
 
@@ -31,7 +33,7 @@ Yetersiz bakiyede işlem yapılmaz. Açılmış ipucu tekrar ücretlendirilmez. 
 
 ## Yerel kayıt
 
-`user://progress.json`: şema ve içerik sürümü, ad, öğretici durumu, altın, tamamlanan bölümler, devam edilen zincirlerin adımı/açık harfleri/ipucu durumu ve animasyon tercihi. V1'den geçişte kazanılmış altın ve tamamlanan bölümler korunur; eski harf maskeleri yeni ekli biçimlerle çakışmaması için sıfırlanır. Her ekonomik işlem, tamamlanma ve profil değişikliğinde kaydedilir. Web'de Godot'un IndexedDB dosya sistemi kullanılır. Tarayıcı verileri silinirse veya gizli oturum kullanılırsa kayıt kaybolabilir. Veriler cihazlar arasında senkronize edilmez.
+`user://progress.json`: şema, içerik ve giriş kuralları sürümü, ad, öğretici durumu, altın, tamamlanan bölümler, devam edilen zincirlerin adımı/açık harfleri/ipucu durumu ve animasyon tercihi. V2'den V3'e geçişte yarım kalan bölümlerde kayıtlı joker ücretleri bir kez iade edilir; açılmış harfler ve tamamlanan bulmacaların kimlikleri korunur. Her ekonomik işlem, tamamlanma ve profil değişikliğinde kaydedilir. Web'de Godot'un IndexedDB dosya sistemi kullanılır. Tarayıcı verileri silinirse veya gizli oturum kullanılırsa kayıt kaybolabilir. Veriler cihazlar arasında senkronize edilmez.
 
 ## Parti modu
 
@@ -53,13 +55,15 @@ Kuş ve eski çizimler kaldırılmıştır. Yeni açık/koyu arka planlar, şeff
 
 ## Performans bütçesi
 
-Oyun yalnızca 2D Control düğümleri kullanır. 30 FPS üst sınır; oyun mantığında sürekli `_process` veya fizik döngüsü yoktur. Sayaç yalnızca parti oynanırken saniyede bir çalışır. Konfeti 22 basit dörtgenden oluşur; kısa sürede temizlenir ve profil üzerinden kapatılabilir. Ekranlar değiştirilirken önceki düğümler ve animasyonlar temizlenir.
+Oyun yalnızca 2D Control düğümleri kullanır; 3D ve kullanılmayan fizik sunucuları kapalıdır. Web'de `Engine.max_fps=0` ve düşük işlemci modunun bekleme süresi 0'dır: tarayıcının ana iş parçacığında WASM uyku/busy-wait yapılmaz. Kare zamanlaması asenkron tarayıcı timer/RAF ile boşta yaklaşık 10 Hz, etkileşimde en fazla 60 Hz'dir. Düşük işlemci modu görüntü değişmedikçe GPU çizimini atlar. Native sürümde 30 FPS ve gerçek OS beklemesi kullanılır. Kullanılmayan ses çıkışı web'de Dummy sürücüsüdür.
+
+Oyun mantığında sürekli `_process` döngüsü yoktur. Sayaç yalnızca parti oynanırken saniyede bir çalışır. Konfeti 22 basit dörtgenden oluşur; kısa sürede temizlenir ve profil üzerinden kapatılabilir. Ekranlar değiştirilirken önceki düğümler ve animasyonlar temizlenir. [Önce/sonra ölçüm raporu](PERFORMANCE-V3.md).
 
 Arka planlar 512×768, simgeler 96×96, logo en fazla 600×440 WebP. Küçük arka planlar yaklaşık 6 ve 11 KB'dır. Godot texture import sıkıştırması kayıplı WebP, kalite 0.88; mipmap yoktur. Nunito yaklaşık 270 KB. Ok ve onay işaretleri için küçük bir DejaVu Sans alt kümesi kullanılır. Büyük üretim PNG'leri dağıtıma dahil edilmez. Yazı ve butonlar motorun yerel UI bileşenleridir; ekran görüntüsü olarak paketlenmez.
 
 Kaydırma çubukları hem Godot'ta hem HTML'de gizlidir; kaydırma çalışır. Görünen bütün metin kutularını Godot çizer. HTML input'lar şeffaf klavye alanlarıdır; böylece kaydırırken ikinci bir kutu ve metin katmanı görünmez. Yalnızca kaydırma/boyut değişimi olaylarında konum güncellenir. Oyun sırasında aynı input sözcükler arasında korunur. Klavye açıldığında harf satırı görünür alana kaydırılır.
 
-Web: single-thread export, GDExtension kapalı, VRAM sıkıştırma kapalı, ek CDN veya çalışma zamanı ağı yok. GitHub Pages'te özel COOP/COEP başlığı gerektirmez. Godot WebAssembly motoru ayrıca indirilir; bu boyut oyun çizimleriyle karıştırılmamalıdır. Motor 39.514.754 bayt; gzip aktarımı 10.054.758 bayttır. GitHub Pages özel sıkıştırma başlıkları sunmadığından modern tarayıcılarda DecompressionStream kullanılarak sıkıştırılmış motor akış hâlinde açılır ve WebAssembly derlemesine verilir. Bu API olmayan eski tarayıcılarda standart WASM dosyasına dönülür. Oyun PCK paketi yaklaşık 400 KB. PCK hash'i tarayıcı önbellek anahtarıdır; yeni sürümde eski oyun verisi gelmez, aynı motor dosyası tekrar kullanılır.
+Web: single-thread export, GDExtension kapalı, VRAM sıkıştırma kapalı, ek CDN veya çalışma zamanı ağı yok. GitHub Pages'te özel COOP/COEP başlığı gerektirmez. Godot WebAssembly motoru ayrıca indirilir; bu boyut oyun çizimleriyle karıştırılmamalıdır. Motor 39.514.754 bayt; gzip aktarımı 10.054.758 bayttır. GitHub Pages özel sıkıştırma başlıkları sunmadığından modern tarayıcılarda DecompressionStream kullanılarak sıkıştırılmış motor akış hâlinde açılır ve WebAssembly derlemesine verilir. Bu API olmayan eski tarayıcılarda standart WASM dosyasına dönülür. Oyun PCK paketi yaklaşık 405 KB. PCK hash'i tarayıcı önbellek anahtarıdır; yeni sürümde eski oyun verisi gelmez, aynı motor dosyası tekrar kullanılır.
 
 ## İngilizceye hazırlık
 

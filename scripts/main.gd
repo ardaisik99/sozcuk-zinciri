@@ -13,6 +13,7 @@ const CATEGORY_ART = ["icon_tea", "icon_leaf", "icon_book"]
 
 var state = GameState.new()
 var levels: Array = []
+var level_by_id: Dictionary = {}
 var screen = ""
 var page: VBoxContainer
 var scroll: ScrollContainer
@@ -52,7 +53,15 @@ var answer_timer: Timer
 
 func _ready() -> void:
 	RenderingServer.set_default_clear_color(CREAM)
-	Engine.max_fps = 30
+	# A positive max_fps sleeps inside Godot's WebAssembly callback. On the
+	# browser main thread nanosleep busy-waits, monopolising input and a CPU core.
+	# Let browser RAF schedule frames and redraw only when the UI changes.
+	Engine.max_fps = 0 if OS.has_feature("web") else 30
+	OS.low_processor_usage_mode = true
+	OS.low_processor_usage_mode_sleep_usec = 0 if OS.has_feature("web") else 33000
+	get_viewport().disable_3d = true
+	PhysicsServer2D.set_active(false)
+	PhysicsServer3D.set_active(false)
 	get_window().size_changed.connect(_adapt_scale)
 	_adapt_scale()
 	var source_font = load("res://assets/Nunito.ttf")
@@ -76,15 +85,20 @@ func _ready() -> void:
 		web_input_callback = JavaScriptBridge.create_callback(_web_input_changed)
 		web_input.changed = web_input_callback
 		resized.connect(func(): call_deferred("_position_web_input"))
-	state.load_save()
+	if not get_tree().has_meta("test_mode"): state.load_save()
 	levels = JSON.parse_string(FileAccess.get_file_as_string("res://data/levels.json"))
+	for level in levels:
+		level.id = int(level.id)
+		level.order = int(level.order)
+		level_by_id[level.id] = level
+	levels.sort_custom(func(a,b): return int(a.order) < int(b.order))
 	party_clock = Timer.new()
 	party_clock.wait_time = 1.0
 	party_clock.timeout.connect(_party_tick)
 	add_child(party_clock)
 	answer_timer = Timer.new()
 	answer_timer.one_shot = true
-	answer_timer.wait_time = 0.24
+	answer_timer.wait_time = 0.18
 	answer_timer.timeout.connect(func():
 		if screen == "game" and not busy and WordRules.matches(entry.text,current,cursor,revealed): submit_answer())
 	add_child(answer_timer)
@@ -93,6 +107,11 @@ func _ready() -> void:
 	if str(state.data.name).is_empty(): show_profile_setup()
 	elif not state.data.tutorial: show_tutorial_intro()
 	else: show_home()
+	var refund = int(state.data.get("hint_refund_pending",0))
+	if refund > 0:
+		toast("Jokerlerin için "+str(refund)+" altın geri yüklendi.")
+		state.data.hint_refund_pending = 0
+		state.save()
 
 func _adapt_scale() -> void:
 	var pixels = get_window().size
@@ -478,7 +497,7 @@ func show_home() -> void:
 	center_label(page,"Bir kelimeyle başla, bağlantıyı keşfet.",14,MUTED)
 	gap(page,12)
 	var next = next_level_id()
-	menu_button(page,"Tek Oyunculu","play",func(): start_level(next),"Bölüm "+str(next)+" · "+levels[next-1].category)
+	menu_button(page,"Tek Oyunculu","play",func(): start_level(next),"Bölüm "+str(int(level_by_id[next].order))+" · "+level_by_id[next].difficulty)
 	menu_button(page,"Çok Oyunculu","versus",show_online)
 	menu_button(page,"Parti Modu","party",show_party_setup)
 	var bottom = row_to(page,14)
@@ -515,26 +534,28 @@ func show_levels() -> void:
 		grid.add_theme_constant_override("h_separation",10)
 		grid.add_theme_constant_override("v_separation",12)
 		page.add_child(grid)
-		for j in range(8):
-			var id = i*8+j+1
+		var category_levels: Array = levels.filter(func(level): return level.category == CATEGORIES[i])
+		for j in range(category_levels.size()):
+			var level = category_levels[j]
+			var id = int(level.id)
 			var done = id in state.data.completed
-			var unlocked = j == 0 or id-1 in state.data.completed or done
-			var b = button_to(grid,str(id)+(" ✓" if done else ""),func(): start_level(id),LILAC if done else Color.WHITE,PURPLE,72)
+			var unlocked = j == 0 or category_levels[j-1].id in state.data.completed or done
+			var b = button_to(grid,str(int(level.order))+(" ✓" if done else ""),func(): start_level(id),LILAC if done else Color.WHITE,PURPLE,72)
 			b.custom_minimum_size.x = 80
 			b.disabled = not unlocked
-			b.tooltip_text = "Tekrar oyna" if done else "Önceki bölümü tamamla" if not unlocked else "Zinciri keşfet"
+			b.tooltip_text = "Tekrar oyna" if done else "Önceki bölümü tamamla" if not unlocked else str(level.difficulty)
 	center_label(page,"Her kategorinin ilk bölümü açık.\nÇözdükçe yeni bağlantılara ulaşırsın.",13,MUTED)
 
 func start_level(id: int, selected_mode: String = "solo") -> void:
 	mode = selected_mode
-	current = levels[id-1].duplicate(true)
+	current = level_by_id[id].duplicate(true)
 	cursor = 1
 	revealed = [0]
 	clues = {}
 	if mode == "solo" and state.data.active.has(str(id)):
 		var saved = state.data.active[str(id)]
 		cursor = clampi(int(saved.get("cursor",1)),1,current.words.size()-1)
-		revealed = saved.get("revealed",[0])
+		revealed = saved.get("revealed",[0]).map(func(at): return int(at))
 		clues = saved.get("clues",{})
 	show_game()
 	if mode == "party":
@@ -566,9 +587,9 @@ func show_game(message: String = "", keep_input: bool = false) -> void:
 	else:
 		reset_page("game")
 		entry = null
-	header("Öğretici" if mode == "tutorial" else party_names[party_index % party_names.size()] if mode == "party" else "Bölüm "+str(int(current.id)),leave_game)
+	header("Öğretici" if mode == "tutorial" else party_names[party_index % party_names.size()] if mode == "party" else "Bölüm "+str(int(current.order)),leave_game)
 	var top = row_to(page)
-	var cat = label_to(top,current.category,13,PURPLE,true)
+	var cat = label_to(top,current.difficulty+" · "+current.category,13,PURPLE,true)
 	cat.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if mode == "party": clock_label = label_to(top,str(party_remaining)+" sn",15,PURPLE,true)
 	else: label_to(top,str(cursor)+" / "+str(current.words.size()-1)+" bağlantı",13,MUTED)
@@ -649,6 +670,8 @@ func show_game(message: String = "", keep_input: bool = false) -> void:
 	cb.add_theme_font_size_override("font_size",13)
 	cb.disabled = clues.has(hint_key)
 	busy = false
+	if OS.has_feature("web"):
+		web_input.setWord(int(current.id),cursor,str(current.words[cursor-1]),WordRules.form(current,cursor)[0],WordRules.form(current,cursor).length())
 	_sync_game_input()
 	if mode == "party": party_clock.start()
 
@@ -664,13 +687,21 @@ func _sync_game_input() -> void:
 func update_tiles(value: String) -> void:
 	if screen != "game" or busy: return
 	var surface = WordRules.form(current,cursor)
-	var shown = WordRules.display(value,surface,revealed)
+	var resolved = WordRules.resolve(value,current,cursor,revealed)
+	var shown: String = resolved.letters
 	for i in range(active_tiles.size()):
 		active_tiles[i].text = shown[i] if i < shown.length() else ""
 		active_tiles[i].add_theme_color_override("font_color",PURPLE if i in revealed else INK)
 	answer_timer.stop()
-	if WordRules.matches(value,current,cursor,revealed):
+	if resolved.accepted:
+		feedback.text = "Doğru bağlantı!"
+		feedback.add_theme_color_override("font_color",GREEN)
 		answer_timer.start()
+	elif resolved.reason == "overflow":
+		feedback.text = "Fazla harf var. Son harfi silip tekrar dene."
+		feedback.add_theme_color_override("font_color",Color("b46a3f"))
+	elif resolved.reason == "phrase":
+		feedback.text = "Yalnızca sıradaki sözcüğü yaz."
 	else:
 		var raw = WordRules.typed(value)
 		var used = raw.length() if raw.begins_with(surface[0]) else raw.length()+1
@@ -680,6 +711,10 @@ func update_tiles(value: String) -> void:
 
 func submit_answer() -> void:
 	if busy or screen != "game" or not is_instance_valid(entry): return
+	if mode == "party" and Time.get_ticks_msec()-party_started >= 90000:
+		party_clock.stop()
+		finish_party_turn(false)
+		return
 	answer_timer.stop()
 	if not WordRules.matches(entry.text,current,cursor,revealed):
 		feedback.text = "Bağlantıyı bir daha düşün. İlk harfi tekrar yazmana gerek yok."
@@ -695,17 +730,17 @@ func submit_answer() -> void:
 		sparkle_tweens.append(tw)
 		for i in range(active_tiles.size()):
 			active_tiles[i].pivot_offset = active_tiles[i].size/2
-			tw.parallel().tween_property(active_tiles[i],"scale",Vector2(1.15,1.15),0.12).set_delay(i*0.025)
-		tw.chain().tween_interval(0.12)
+			tw.parallel().tween_property(active_tiles[i],"scale",Vector2(1.1,1.1),0.09).set_delay(i*0.012)
+		tw.chain().tween_interval(0.06)
 		for i in range(active_tiles.size()):
 			if i >= stem.length():
-				tw.parallel().tween_property(tile_panels[i],"modulate:a",0.0,0.16)
+				tw.parallel().tween_property(tile_panels[i],"modulate:a",0.0,0.12)
 			else:
 				var at = i
-				tw.parallel().tween_property(active_tiles[i],"scale",Vector2.ONE,0.16)
+				tw.parallel().tween_property(active_tiles[i],"scale",Vector2.ONE,0.12)
 				tw.parallel().tween_callback(func():
-					if is_instance_valid(active_tiles[at]): active_tiles[at].text = stem[at]).set_delay(0.08)
-		tw.chain().tween_interval(0.12)
+					if is_instance_valid(active_tiles[at]): active_tiles[at].text = stem[at]).set_delay(0.045)
+		tw.chain().tween_interval(0.05)
 		await tw.finished
 	if screen != "game" or generation != game_generation: return
 	_commit_answer()
@@ -737,6 +772,7 @@ func _commit_answer() -> void:
 func reveal_letter() -> void:
 	if busy: return
 	var surface = WordRules.form(current,cursor)
+	var before = WordRules.resolve(entry.text,current,cursor,revealed)
 	var hidden: Array = []
 	for i in range(1,surface.length()):
 		if not i in revealed: hidden.append(i)
@@ -746,11 +782,15 @@ func reveal_letter() -> void:
 		return
 	if mode == "party": party_scores[party_index % party_names.size()] -= 10
 	revealed.append(hidden.pick_random())
+	# Keep entered letters in their cells when a joker locks another cell.
+	var remainder = ""
+	for i in range(surface.length()):
+		if not i in revealed: remainder += str(before.letters)[i]
+	entry.text = remainder.rstrip(" ")
+	if OS.has_feature("web"): web_input.setValue(str(entry.get_instance_id()),entry.text)
 	save_active()
 	show_game("Bir harf daha açıldı.",true)
-	if revealed.size() == surface.length():
-		entry.text = surface
-		update_tiles(surface)
+	update_tiles(entry.text)
 
 func reveal_clue() -> void:
 	if busy or clues.has(str(cursor)): return
@@ -784,8 +824,8 @@ func show_win(rewarded: bool) -> void:
 	gap(page,4)
 	if mode == "tutorial": button_to(page,"Keşfe başla   →",show_home)
 	else:
-		var id = int(current.id)
-		if id < levels.size(): button_to(page,"Sıradaki zincir   →",func(): start_level(id+1))
+		var number = int(current.order)
+		if number < levels.size(): button_to(page,"Sıradaki zincir   →",func(): start_level(int(levels[number].id)))
 		button_to(page,"Keşif rotana dön",show_levels,LILAC,PURPLE)
 	confetti()
 
@@ -962,7 +1002,7 @@ func show_profile() -> void:
 		profile_name.text = draft,
 		("Açık" if state.data.motion else "Kapalı")+" · Değiştirmek için dokun")
 	menu_button(page,"Nasıl oynanır?","hint",show_tutorial_intro)
-	center_label(page,"Türkçe · Sürüm 2.0\nİlerlemen yalnızca bu cihazda saklanır.",12,MUTED)
+	center_label(page,"Türkçe · Sürüm 3.0\nİlerlemen yalnızca bu cihazda saklanır.",12,MUTED)
 
 func toast(message: String) -> void:
 	var panel = panel_to(overlay,PURPLE,18)

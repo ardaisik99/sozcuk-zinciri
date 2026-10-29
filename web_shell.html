@@ -32,10 +32,13 @@ body{display:flex;align-items:center;justify-content:center}
 <div id="native-fields"></div>
 <div id="status" role="status" aria-live="polite"><img src="logo_dark.webp" width="310" height="220" alt="Sözcük Zinciri"><div class="track"><div id="fill"></div></div><p id="detail">Kelimeler hazırlanıyor…</p><p id="error" hidden></p><button id="retry" hidden onclick="location.reload()">Yeniden Dene</button></div>
 </main>
+<script src="benchmark.js"></script>
+<script src="frame-pacer.js?v=__BUILD_ID__"></script>
 <script src="word-input.js?v=__BUILD_ID__"></script>
 <script src="$GODOT_URL"></script>
 <script>
 const config=$GODOT_CONFIG;
+config.args=(config.args||[]).concat(['--audio-driver','Dummy']);
 const buildId='__BUILD_ID__';
 const originalFetch=window.fetch.bind(window);
 window.fetch=async function(input,options){

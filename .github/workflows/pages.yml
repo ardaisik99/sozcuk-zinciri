@@ -28,8 +28,7 @@ jobs:
       - name: Import, check and export
         run: |
           Godot_v4.7.2-stable_linux.x86_64 --headless --path . --editor --import --quit
-          Godot_v4.7.2-stable_linux.x86_64 --headless --path . --script tests/test_state.gd
-          Godot_v4.7.2-stable_linux.x86_64 --headless --path . --script tests/test_flows.gd
+          python3 scripts/check_project.py Godot_v4.7.2-stable_linux.x86_64
           mkdir -p web
           Godot_v4.7.2-stable_linux.x86_64 --headless --path . --export-release Web web/index.html
           python3 scripts/package_web.py

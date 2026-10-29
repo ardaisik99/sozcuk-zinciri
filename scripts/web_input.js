@@ -16,7 +16,10 @@
       e.setAttribute('autocorrect', 'off');
       e.setAttribute('autocapitalize', 'off');
       e.setAttribute('aria-label', placeholder);
-      e.addEventListener('input', () => this.changed?.(id, e.value, 'change'));
+      e.addEventListener('input', event => {
+        if (!event.isComposing) this.changed?.(id, e.value.normalize('NFC'), 'change');
+      });
+      e.addEventListener('compositionend', () => this.changed?.(id, e.value.normalize('NFC'), 'change'));
       e.addEventListener('focus', () => this.changed?.(id, e.value, 'focus'));
       e.addEventListener('blur', () => this.changed?.(id, e.value, 'blur'));
       e.addEventListener('keydown', event => {
@@ -59,8 +62,23 @@
       e.value = '';
       if (document.activeElement === e) e.setSelectionRange(0, 0);
     },
+    setValue(id, value) {
+      const e = this.fields.get(id); if (!e) return;
+      e.value = value;
+      if (document.activeElement === e) e.setSelectionRange(value.length, value.length);
+    },
     focused() { return document.activeElement?.dataset.fieldId || ''; },
-    setScreen(id) { stage.dataset.screen = id; },
+    setScreen(id) {
+      stage.dataset.screen = id;
+      if (id !== 'game') { delete stage.dataset.level; delete stage.dataset.step; }
+      window.framePacer?.wake(['win','party_results','countdown'].includes(id) ? 3400 : 1200);
+    },
+    setWord(level,step,previous,initial,count) {
+      stage.dataset.level = level; stage.dataset.step = step;
+      const description = previous+' ile bağlanan '+initial+' harfiyle başlayan '+count+' harfli sözcük';
+      canvas.setAttribute('aria-label','Sözcük Zinciri — '+description);
+      this.fields.forEach(e => { if (e.classList.contains('tiles')) e.setAttribute('aria-description',description); });
+    },
     blur() { this.fields.forEach(e => e.blur()); },
     close() { this.fields.forEach(e => e.remove()); this.fields.clear(); }
   };

@@ -21,8 +21,11 @@ Web çıktısı `file://` üzerinden çalıştırılmaz; HTTP/HTTPS gerekir. Git
 ```powershell
 godot --headless --path . --script tests/test_state.gd
 godot --headless --path . --script tests/test_flows.gd
+python scripts/check_project.py godot
 ```
 
 [Oyun tasarımı ve performans kararları](docs/TASARIM.md). Çevrim içi yarış bu sürümde bağlı değildir. APK/IPA çıktısı hazırlanmaz.
 
 Web giriş köprüsü `scripts/web_input.js` içindedir. Görünen bütün alanları Godot çizer; şeffaf DOM girdileri yalnızca cihazın klavyesi içindir. Aynı DOM alanı sonraki sözcüklerde korunur. `data/levels.json` içindeki `forms` ekli biçimleri, `words` ise kökleri tanımlar. Gelişigüzel ek kesme algoritması kullanılmaz.
+
+V3: joker sonrası görüntü/doğrulama aynı çözücüyü kullanır, i/ı klavye farkı tolere edilir. Bölümler sabit içerik kimlikleri korunarak `order` ile kolaydan zora sıralanır. Web'de bloklayan FPS beklemesi kaldırılmıştır. [Ölçüm raporu](docs/PERFORMANCE-V3.md).
