@@ -28,6 +28,7 @@
   function fitCanvas(){const dpr=Math.min(window.devicePixelRatio||1,2),w=Math.round(stage.clientWidth*dpr),h=Math.round(stage.clientHeight*dpr);if(canvas.width!==w)canvas.width=w;if(canvas.height!==h)canvas.height=h;}
   fitCanvas();new ResizeObserver(fitCanvas).observe(stage);
   stage.dataset.loadState='loading';
+  if(typeof Engine==='undefined') { fail(new Error('Motor başlatıcısı indirilemedi.')); return; }
   const engine=new Engine(config);
   if(Engine.getMissingFeatures({threads:false}).length) { fail(new Error('WebGL 2 ve WebAssembly gerekiyor.')); return; }
   engine.startGame().then(()=>{
@@ -42,6 +43,7 @@
     if (!ready()) {
       const watch=new MutationObserver(()=>{if(ready())watch.disconnect();});
       watch.observe(stage,{attributes:true,attributeFilter:['data-screen']});
+      setTimeout(()=>{watch.disconnect();if(stage.dataset.loadState!=='ready')fail(new Error('İlk ekran açılamadı.'));},12000);
     }
   }).catch(fail);
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&document.activeElement?.tagName==='INPUT')document.activeElement.blur();});

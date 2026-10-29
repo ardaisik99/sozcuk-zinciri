@@ -20,7 +20,8 @@ jobs:
           git clone --depth 1 https://github.com/emscripten-core/emsdk.git /tmp/emsdk
           /tmp/emsdk/emsdk install 4.0.11
           /tmp/emsdk/emsdk activate 4.0.11
-      - uses: actions/cache@v4
+      - uses: actions/cache/restore@v4
+        id: compiler-cache
         with:
           path: /tmp/scons-cache
           key: godot-4.7.2-web-4.0.11-${{ hashFiles('scripts/lean_web.py') }}
@@ -28,12 +29,18 @@ jobs:
         working-directory: engine
         env:
           SCONS_CACHE: /tmp/scons-cache
+          EMCC_CORES: 4
         run: |
           source /tmp/emsdk/emsdk_env.sh
-          scons --jobs=2 profile=../scripts/lean_web.py
+          scons --jobs=4 platform=web target=template_release production=yes optimize=size_extra profile=../scripts/lean_web.py
           sha256sum bin/godot.web.template_release.wasm32.nothreads.zip
           git rev-parse HEAD > bin/godot-revision.txt
           cp ../scripts/lean_web.py bin/lean_web.py
+      - uses: actions/cache/save@v4
+        if: always() && steps.compiler-cache.outputs.cache-hit != 'true'
+        with:
+          path: /tmp/scons-cache
+          key: godot-4.7.2-web-4.0.11-${{ hashFiles('scripts/lean_web.py') }}
       - uses: actions/upload-artifact@v4
         with:
           name: lean-web-4.7.2
