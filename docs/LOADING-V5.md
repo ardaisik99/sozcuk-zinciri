@@ -15,6 +15,16 @@ V5 yükleyicisi:
 
 İlk aşamanın canlı GitHub Pages ölçümü: standart motor + yeni yükleyici ile ilk ekran 18.399 ms; aynı içerik ve motor önbellekteyken 690 ms. Bu değerler test edilen bağlantı ve tarayıcıya aittir. Python dosya aktarım süresi ile tarayıcı hazır ekran süresi aynı ölçüm değildir.
 
+Son yayın (`?v=5.1`, 30 Ekim 2026, 390 × 844 tarayıcı):
+
+| Ölçüm | Süre |
+| --- | ---: |
+| İlk içerikli boyama, motor önbellekte değilken | 412 ms |
+| Küçük motorla ilk hazır ekran | 3.773 ms |
+| Aynı motor/içerikle tekrar hazır ekran | 743 ms |
+
+Son ilk açılışta 4.630.972 B motor ve 227.766 B oyun verisi gzip olarak ağdan geldi. Tekrar açılışta iki dosya da Cache Storage'dan geldi; bunlar için ağ indirmesi yapılmadı. HTML/başlatıcı gibi küçük sayfa istekleri bu ifadeye dahil değildir. Ham kayıtlar [perf-loading-v5.json](perf-loading-v5.json) dosyasındadır. Süreler bu cihaz/bağlantıdaki ölçümdür; bütün cihazlara veya ağlara ait sabit süre garantisi değildir. Fiziksel iOS/Android cihazda ölçüm yapılmadı.
+
 ## Küçük Godot motoru
 
 `scripts/lean_web.py` yalnızca GDScript, FreeType, basit metin sunucusu ve WebP modüllerini içerir. 3D, fizik, gezinme, XR, gelişmiş GUI ve kullanılmayan medya/ağ modülleri derlemeye alınmaz. Emscripten 4.0.11, tek iş parçacığı, yayın hedefi ve boyut optimizasyonu kullanılır. Türkçe Latin metni ve cihaz klavyesi korunur. Web motorunun fizik sınıflarına doğrudan bağımlılık kaldırılmıştır; standart editörde mevcut fizik sunucuları yine kapatılır.

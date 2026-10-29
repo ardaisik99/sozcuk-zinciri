@@ -1,0 +1,93 @@
+{
+  "date": "2026-10-30",
+  "viewport": "390x844",
+  "url": "https://ardaisik99.github.io/sozcuk-zinciri/?v=5.1",
+  "samples": [
+    {
+      "phase": "parallel-standard-runtime",
+      "readyMs": 18399,
+      "progress": {
+        "runtime": {
+          "loaded": 10054758,
+          "total": 10054758,
+          "cached": false
+        },
+        "game": {
+          "loaded": 227045,
+          "total": 227045,
+          "cached": false
+        }
+      }
+    },
+    {
+      "phase": "game-update-with-runtime-cache",
+      "readyMs": 2067,
+      "progress": {
+        "game": {
+          "loaded": 227043,
+          "total": 227043,
+          "cached": false
+        },
+        "runtime": {
+          "loaded": 10054758,
+          "total": 10054758,
+          "cached": true
+        }
+      }
+    },
+    {
+      "phase": "warm-standard-runtime",
+      "readyMs": 690,
+      "progress": {
+        "game": {
+          "loaded": 227043,
+          "total": 227043,
+          "cached": true
+        },
+        "runtime": {
+          "loaded": 10054758,
+          "total": 10054758,
+          "cached": true
+        }
+      }
+    },
+    {
+      "phase": "cold-small-runtime",
+      "readyMs": 3773,
+      "firstContentfulPaintMs": 412,
+      "progress": {
+        "runtime": {
+          "loaded": 4630972,
+          "total": 4630972,
+          "cached": false,
+          "encoding": "gzip"
+        },
+        "game": {
+          "loaded": 227766,
+          "total": 227766,
+          "cached": false,
+          "encoding": "gzip"
+        }
+      }
+    },
+    {
+      "phase": "warm-small-runtime",
+      "readyMs": 743,
+      "firstContentfulPaintMs": 344,
+      "progress": {
+        "game": {
+          "loaded": 227766,
+          "total": 227766,
+          "cached": true,
+          "encoding": "gzip"
+        },
+        "runtime": {
+          "loaded": 4630972,
+          "total": 4630972,
+          "cached": true,
+          "encoding": "gzip"
+        }
+      }
+    }
+  ]
+}
