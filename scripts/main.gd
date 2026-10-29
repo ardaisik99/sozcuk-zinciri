@@ -50,6 +50,8 @@ var web_input: JavaScriptObject
 func _ready() -> void:
 	RenderingServer.set_default_clear_color(CREAM)
 	Engine.max_fps = 30
+	get_window().size_changed.connect(_adapt_scale)
+	_adapt_scale()
 	var source_font = load("res://assets/Nunito.ttf")
 	source_font.fallbacks = [load("res://assets/Symbols.ttf")]
 	var regular = FontVariation.new()
@@ -83,6 +85,20 @@ func _ready() -> void:
 	elif not state.data.tutorial: show_tutorial_intro()
 	else: show_home()
 
+func _adapt_scale() -> void:
+	var pixels = get_window().size
+	if pixels.x <= 0: return
+	get_window().content_scale_size = Vector2i(432,maxi(1,roundi(432.0*pixels.y/pixels.x)))
+	if OS.has_feature("web"):
+		await get_tree().process_frame
+		await get_tree().process_frame
+		if web_input != null and is_instance_valid(scroll):
+			var focused_id = str(web_input.focused())
+			if web_entries.has(focused_id) and is_instance_valid(web_entries[focused_id]):
+				scroll.ensure_control_visible(web_entries[focused_id])
+				await get_tree().process_frame
+				_position_web_input()
+
 func style(color: Color, radius: int = 20, border: Color = Color.TRANSPARENT, width: int = 0) -> StyleBoxFlat:
 	var s = StyleBoxFlat.new()
 	s.bg_color = color
@@ -93,6 +109,12 @@ func style(color: Color, radius: int = 20, border: Color = Color.TRANSPARENT, wi
 	s.content_margin_right = 18
 	s.content_margin_top = 12
 	s.content_margin_bottom = 12
+	return s
+
+func track_style(color: Color) -> StyleBoxFlat:
+	var s = style(color,3)
+	s.content_margin_top = 0
+	s.content_margin_bottom = 0
 	return s
 
 func text_label(value: String, size_px: int = 16, color: Color = INK, heavy: bool = false) -> Label:
@@ -249,8 +271,8 @@ func show_loading() -> void:
 	p.custom_minimum_size.y = 6
 	p.show_percentage = false
 	p.value = 100
-	p.add_theme_stylebox_override("background",style(LILAC,3))
-	p.add_theme_stylebox_override("fill",style(PURPLE,3))
+	p.add_theme_stylebox_override("background",track_style(LILAC))
+	p.add_theme_stylebox_override("fill",track_style(PURPLE))
 	page.add_child(p)
 
 func create_entry(parent: Node, placeholder: String, maximum: int = 20) -> LineEdit:
@@ -520,8 +542,8 @@ func show_game(message: String = "") -> void:
 	progress.value = cursor-1
 	progress.show_percentage = false
 	progress.custom_minimum_size.y = 5
-	progress.add_theme_stylebox_override("background",style(LILAC,3))
-	progress.add_theme_stylebox_override("fill",style(PURPLE,3))
+	progress.add_theme_stylebox_override("background",track_style(LILAC))
+	progress.add_theme_stylebox_override("fill",track_style(PURPLE))
 	page.add_child(progress)
 	var chain = box_to(page,5)
 	active_tiles.clear()
