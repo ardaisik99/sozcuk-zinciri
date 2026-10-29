@@ -1088,7 +1088,7 @@ func show_profile() -> void:
 		profile_name.text = draft,
 		("Açık" if state.data.motion else "Kapalı")+" · Değiştirmek için dokun")
 	menu_button(page,"Nasıl oynanır?","hint",show_tutorial_intro)
-	center_label(page,"Türkçe · Sürüm 4.0\nİlerlemen yalnızca bu cihazda saklanır.",12,MUTED)
+	center_label(page,"Türkçe · Sürüm 5.0\nİlerlemen yalnızca bu cihazda saklanır.",12,MUTED)
 
 func toast(message: String) -> void:
 	var panel = panel_to(overlay,PURPLE,18)

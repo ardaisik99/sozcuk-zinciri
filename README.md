@@ -6,9 +6,11 @@ Godot 4.7.2 ile Türkçe, dikey mobil kelime bulmaca. 24 bölüm, üç kategori,
 
 Godot'ta `project.godot` dosyasını açıp F6 yerine F5 ile ana sahneyi çalıştırın. Ek paket veya API anahtarı gerekmez.
 
-Web için aynı Godot sürümünün export template paketini yükleyin:
+Web için küçük, doğrulanmış Godot şablonunu kurun:
 
 ```powershell
+python -m pip install brotli
+python scripts/install_web_template.py
 godot --headless --path . --export-release Web web/index.html
 python scripts/package_web.py
 python -m http.server 8765 --directory web
@@ -31,3 +33,5 @@ Web giriş köprüsü `scripts/web_input.js` içindedir. Görünen bütün alanl
 V3: joker sonrası görüntü/doğrulama aynı çözücüyü kullanır, i/ı klavye farkı tolere edilir. Bölümler sabit içerik kimlikleri korunarak `order` ile kolaydan zora sıralanır. Web'de bloklayan FPS beklemesi kaldırılmıştır. [Ölçüm raporu](docs/PERFORMANCE-V3.md).
 
 V4 görselleri, üretim briefleri, sıkıştırma boyutları ve tarayıcı kontrolleri: [V4 tasarım ve varlık notları](docs/ASSETS-V4.md). [Web sürümü](https://ardaisik99.github.io/sozcuk-zinciri/?v=4).
+
+V5: küçük yayın motoru, paralel ve doğrulanan parça indirme, motor/içerik için ayrı kalıcı önbellek ve HTML içine alınmış ilk ekran görselleri. [Yükleme raporu](docs/LOADING-V5.md), [güncel web sürümü](https://ardaisik99.github.io/sozcuk-zinciri/?v=5.1). Şablon GitHub sürümünden SHA-256 ile doğrulanır; oyun güncellemeleri motorun yeniden indirilmesini gerektirmez.

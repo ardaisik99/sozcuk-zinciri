@@ -1,0 +1,12 @@
+{
+  "godot": "4.7.2",
+  "revision": "ed1daf0bf001b61586d9930840f2f1394092c079",
+  "emscripten": "4.0.11",
+  "url": "https://github.com/ardaisik99/sozcuk-zinciri/releases/download/lean-web-4.7.2-v1/godot.web.template_release.wasm32.nothreads.zip",
+  "sha256": "1c3dd680632fe7c55401617a4b6f014c04473356a2bed1084aab5ea8fa5edae2",
+  "buildRun": "https://github.com/ardaisik99/sozcuk-zinciri/actions/runs/40961147116",
+  "compatibilityUrl": "https://github.com/ardaisik99/sozcuk-zinciri/releases/download/lean-web-4.7.2-v1/legacy-v4-runtime.zip",
+  "compatibilitySha256": "2fb91fe4590f915ad3686c3d4aa50eab451c5c52f414a0f6d3b0b03825738ab4",
+  "wasmSha256": "1101e69f3a89d250538392505d3afe0c7c77b4cd774894d7e608635c0aad2a7d",
+  "wasmBytes": 16138025
+}

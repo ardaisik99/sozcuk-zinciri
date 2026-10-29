@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict');
-const {gzipSync}=require('node:zlib');
+const {gzipSync,brotliCompressSync,brotliDecompressSync}=require('node:zlib');
 const {createHash,webcrypto,randomFillSync}=require('node:crypto');
 const {createAssetFetch}=require('../scripts/asset_loader.js');
 const hash=x=>createHash('sha256').update(x).digest('hex');
@@ -58,6 +58,21 @@ async function run() {
   assert.deepEqual(Buffer.from(await(await make(server(),denied)(asset.url)).arrayBuffer()),raw);
   const fullCache={open:async()=>({match:async()=>null,put:async()=>{throw Error('quota');},keys:async()=>[]})};
   assert.deepEqual(Buffer.from(await(await make(server(),fullCache)(asset.url)).arrayBuffer()),raw);
+  // Exercise native Brotli selection; provide a real zlib stream adapter if
+  // this Node version only implements gzip Compression Streams.
+  const nativeDS=global.DecompressionStream;
+  const br=brotliCompressSync(raw),brAsset={...asset,brotli:'runtime-test.wasm.br',brotliSize:br.length,brotliHash:hash(br)};
+  let nativeBr=true;try{new nativeDS('brotli');}catch(_){nativeBr=false;}
+  if(!nativeBr) global.DecompressionStream=function(format) {
+    if(format!=='brotli') return new nativeDS(format);
+    const parts=[];return new TransformStream({transform(x){parts.push(x);},flush(c){c.enqueue(brotliDecompressSync(Buffer.concat(parts)));}});
+  };
+  try {
+    let selected='';
+    const fetchBr=make(server({bytes:br}),cacheStore(),{assets:[brAsset],onProgress:(n,l,t,c,encoding)=>selected=encoding});
+    assert.deepEqual(Buffer.from(await(await fetchBr(brAsset.url)).arrayBuffer()),raw);
+    assert.equal(selected,'brotli');
+  } finally {global.DecompressionStream=nativeDS;}
   const ds=global.DecompressionStream;global.DecompressionStream=undefined;
   try {
     const plain=server({bytes:raw});

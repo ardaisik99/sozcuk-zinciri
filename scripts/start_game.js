@@ -14,11 +14,11 @@
     console.error(error);
   }
   const progress=new Map();
+  const expected=assets.reduce((n,a)=>n+SozcukAssetLoader.chooseTransport(a).size,0);
   window.fetch=SozcukAssetLoader.createAssetFetch({assets,baseURL:location.href,onError:fail,
-    onProgress:(name,loaded,total,cached)=>{
-      progress.set(name,{loaded,total,cached});
+    onProgress:(name,loaded,total,cached,encoding)=>{
+      progress.set(name,{loaded,total,cached,encoding});
       const all=[...progress.values()];
-      const expected=assets.reduce((n,a)=>n+(typeof DecompressionStream==='function' ? a.gzipSize : a.size),0);
       const received=all.reduce((n,a)=>n+a.loaded,0);
       const percent=Math.min(94,Math.round(received/expected*94));
       fill.style.width=percent+'%';
@@ -38,6 +38,8 @@
     const ready=()=>{
       if (!stage.dataset.screen || stage.dataset.screen==='loading') return false;
       stage.dataset.readyMs=Math.round(performance.now()); stage.dataset.loadState='ready';
+      const paint=performance.getEntriesByType('paint').find(x=>x.name==='first-contentful-paint');
+      if(paint) stage.dataset.firstContentfulPaintMs=Math.round(paint.startTime);
       status.remove();canvas.focus();return true;
     };
     if (!ready()) {

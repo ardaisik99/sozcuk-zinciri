@@ -5,11 +5,16 @@ import shutil
 import hashlib
 import base64
 import json
+import brotli
 
 root = Path(__file__).resolve().parent.parent
 web = root / "web"
 sha = lambda data: hashlib.sha256(data).hexdigest()
 wasm = (web / "index.wasm").read_bytes()
+runtime_manifest=root/'scripts/web_runtime.json'
+if runtime_manifest.is_file():
+    expected_runtime=json.loads(runtime_manifest.read_text(encoding='utf-8'))
+    assert sha(wasm)==expected_runtime['wasmSha256'], 'Export with the pinned small template before packaging'
 engine_js = (web / "index.js").read_bytes()
 pack = (web / "index.pck").read_bytes()
 engine_id = sha(wasm+engine_js)[:16]
@@ -22,10 +27,15 @@ boot_name = f"boot-{sha(boot.encode())[:16]}.js"
 assets=[]
 def asset(name,path,data,mime):
     compressed=gzip.compress(data,compresslevel=9,mtime=0)
+    br=brotli.compress(data,quality=9)
+    compressed_path=f"{Path(path).stem}-{sha(compressed)[:12]}{Path(path).suffix}.gz"
+    br_path=f"{Path(path).stem}-{sha(br)[:12]}{Path(path).suffix}.br"
     (web/path).write_bytes(data)
-    (web/(path+".gz")).write_bytes(compressed)
-    result={"name":name,"url":path,"gzip":path+".gz","size":len(data),"gzipSize":len(compressed),
+    (web/compressed_path).write_bytes(compressed)
+    (web/br_path).write_bytes(br)
+    result={"name":name,"url":path,"gzip":compressed_path,"size":len(data),"gzipSize":len(compressed),
             "hash":sha(data),"gzipHash":sha(compressed),"mime":mime}
+    result.update({"brotli":br_path,"brotliSize":len(br),"brotliHash":sha(br)})
     assets.append(result)
     return result
 engine=asset("runtime",runtime_base+".wasm",wasm,"application/wasm")
@@ -34,7 +44,12 @@ game=asset("game",pack_path,pack,"application/octet-stream")
 (web/boot_name).write_text(boot,encoding="utf-8")
 # Keep exported index.* aliases during the migration so a previously cached
 # HTML document can still retrieve its fixed engine/pack paths.
-(web/"index.wasm.gz").write_bytes((web/(runtime_base+".wasm.gz")).read_bytes())
+(web/"index.wasm.gz").write_bytes((web/engine['gzip']).read_bytes())
+legacy=root/'.tools/legacy-v4'
+if legacy.is_dir():
+    shutil.copyfile(legacy/'index.js',web/'index.js')
+    shutil.copyfile(legacy/'index.wasm.gz',web/'index.wasm.gz')
+    (web/'index.wasm').write_bytes(gzip.decompress((legacy/'index.wasm.gz').read_bytes()))
 shutil.copyfile(root/"assets/Nunito.ttf",web/"Nunito.ttf")
 shutil.copyfile(root/"assets/v4/landscape.webp",web/"landscape.webp")
 for source,target in [("web_input.js","word-input.js"),("frame_pacer.js","frame-pacer.js"),("benchmark.js","benchmark.js")]:
@@ -50,16 +65,17 @@ contents=html.read_text(encoding="utf-8")
 for key,value in replacements.items(): contents=contents.replace(key,value)
 assert not any(key in contents for key in replacements),"Unresolved web shell placeholders"
 html.write_text(contents,encoding="utf-8")
-keep={a["url"] for a in assets}|{a["gzip"] for a in assets}|{runtime_base+".js",boot_name}
+keep={a["url"] for a in assets}|{a["gzip"] for a in assets}|{a["brotli"] for a in assets}|{runtime_base+".js",boot_name}
 for pattern in ("runtime-*","game-*.pck*","boot-*.js"):
     for old in web.glob(pattern):
         if old.is_file() and old.name not in keep: old.unlink()
 (web/".nojekyll").touch()
-licenses=["FONT-LICENSE.txt","SYMBOLS-LICENSE.txt","GODOT-LICENSE.txt"]
+licenses=["FONT-LICENSE.txt","SYMBOLS-LICENSE.txt","GODOT-LICENSE.txt","GODOT-COPYRIGHT.txt"]
 (web/"third-party-licenses.txt").write_text("\n\n".join((root/"assets"/name).read_text(encoding="utf-8") for name in licenses),encoding="utf-8")
 metrics={"assets":assets,"htmlBytes":html.stat().st_size,"htmlGzipBytes":len(gzip.compress(contents.encode(),mtime=0)),
          "bootBytes":len(boot.encode()),"runtimeJsBytes":len(engine_js),"firstDownloadCompressedBytes":sum(a["gzipSize"] for a in assets)}
 (web/"sizes.json").write_text(json.dumps(metrics,indent=2),encoding="utf-8")
 print(f"Engine: {len(wasm):,} bytes raw / {engine['gzipSize']:,} bytes gzip")
+print(f"Engine Brotli: {engine['brotliSize']:,} bytes")
 print(f"Game pack: {len(pack):,} bytes raw / {game['gzipSize']:,} bytes gzip")
 print(f"First paint: inline art/font; HTML gzip {metrics['htmlGzipBytes']:,} bytes")
