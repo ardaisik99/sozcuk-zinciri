@@ -1,0 +1,35 @@
+{
+  "viewport": "390x844",
+  "screen": "profile",
+  "start": {
+    "elapsedMs": 289002,
+    "callbacks": 2547,
+    "callbackMs": 659.5,
+    "clears": 46,
+    "draws": 1329,
+    "longTasks": 1,
+    "longTaskMs": 618,
+    "width": 390,
+    "height": 844
+  },
+  "end": {
+    "elapsedMs": 354011,
+    "callbacks": 3163,
+    "callbackMs": 746,
+    "clears": 46,
+    "draws": 1329,
+    "longTasks": 1,
+    "longTaskMs": 618,
+    "width": 390,
+    "height": 844
+  },
+  "delta": {
+    "elapsedMs": 65009,
+    "callbackMs": 86.5,
+    "callbacks": 616,
+    "clears": 0,
+    "draws": 0,
+    "longTasks": 0,
+    "mainLoopWallTimePercent": 0.1331
+  }
+}

@@ -6,12 +6,11 @@ import hashlib
 
 root = Path(__file__).resolve().parent.parent
 web = root / "web"
-for legacy in ("mascot.webp", "mascot.webp.import"):
+for legacy in ("mascot.webp", "mascot.webp.import", "splash.webp", "logo_dark.webp"):
     old = web / legacy
     if old.is_file(): old.unlink()
 shutil.copyfile(root / "assets" / "Nunito.ttf", web / "Nunito.ttf")
-for name in ("splash.webp", "logo_dark.webp"):
-    shutil.copyfile(root / "assets" / "v2" / name, web / name)
+shutil.copyfile(root / "assets" / "v4" / "landscape.webp", web / "landscape.webp")
 shutil.copyfile(root / "scripts" / "web_input.js", web / "word-input.js")
 shutil.copyfile(root / "scripts" / "benchmark.js", web / "benchmark.js")
 shutil.copyfile(root / "scripts" / "frame_pacer.js", web / "frame-pacer.js")

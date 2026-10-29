@@ -1,13 +1,15 @@
 extends Control
 
-const CREAM = Color("fffefa")
-const INK = Color("292060")
-const MUTED = Color("8981a5")
-const PURPLE = Color("6038ef")
-const LILAC = Color("f0ebff")
-const YELLOW = Color("ffca58")
-const CORAL = Color("ff9664")
-const GREEN = Color("53765b")
+const CREAM = Color("fdfdff")
+const INK = Color("172967")
+const MUTED = Color("7781a5")
+const PURPLE = Color("7845e8")
+const LILAC = Color("eef0fd")
+const YELLOW = Color("ffd25f")
+const CORAL = Color("ff9035")
+const GREEN = Color("148f7c")
+const TEAL = Color("1cb4b7")
+const BLUE = Color("4054ac")
 const CATEGORIES = ["Mutfak", "Doğa", "Günlük Yaşam"]
 const CATEGORY_ART = ["icon_tea", "icon_leaf", "icon_book"]
 
@@ -16,6 +18,7 @@ var levels: Array = []
 var level_by_id: Dictionary = {}
 var screen = ""
 var page: VBoxContainer
+var page_root: VBoxContainer
 var scroll: ScrollContainer
 var overlay: Control
 var font: Font
@@ -139,8 +142,8 @@ func style(color: Color, radius: int = 20, border: Color = Color.TRANSPARENT, wi
 	s.content_margin_top = 12
 	s.content_margin_bottom = 12
 	if color == Color.WHITE or color == PURPLE:
-		s.shadow_color = Color(0.24,0.12,0.57,0.10 if color == Color.WHITE else 0.24)
-		s.shadow_size = 1
+		s.shadow_color = Color(0.10,0.16,0.39,0.15 if color == Color.WHITE else 0.20)
+		s.shadow_size = 2
 		s.shadow_offset = Vector2(0,3)
 	return s
 
@@ -174,15 +177,26 @@ func button_to(parent: Node, value: String, fn: Callable, bg: Color = PURPLE, fg
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	b.add_theme_font_override("font",bold)
 	b.add_theme_font_size_override("font_size",17)
-	b.add_theme_color_override("font_color",fg)
-	b.add_theme_color_override("font_hover_color",fg)
-	b.add_theme_color_override("font_pressed_color",fg)
-	b.add_theme_color_override("font_focus_color",fg)
-	b.add_theme_stylebox_override("normal",style(bg,18))
-	b.add_theme_stylebox_override("hover",style(bg.lightened(0.06),18))
-	b.add_theme_stylebox_override("pressed",style(bg.darkened(0.06),18))
-	b.add_theme_stylebox_override("focus",style(bg,18,YELLOW,2))
-	b.add_theme_stylebox_override("disabled",style(Color("e9e5ec"),18))
+	for item in ["font_color","font_hover_color","font_pressed_color","font_focus_color"]: b.add_theme_color_override(item,fg)
+	var skin = "teal" if bg == TEAL else "purple" if bg == PURPLE else "orange" if bg == CORAL else "gold" if bg == YELLOW else ""
+	if not skin.is_empty():
+		for variant in ["normal","hover","pressed","focus"]:
+			var texture_style = StyleBoxTexture.new()
+			texture_style.texture = load("res://assets/v4/button_"+skin+".webp")
+			for side in [SIDE_LEFT,SIDE_RIGHT]: texture_style.set_texture_margin(side,30)
+			for side in [SIDE_TOP,SIDE_BOTTOM]: texture_style.set_texture_margin(side,26)
+			texture_style.content_margin_left = 16
+			texture_style.content_margin_right = 16
+			texture_style.content_margin_top = 12
+			texture_style.content_margin_bottom = 14
+			texture_style.modulate_color = Color("ededff") if variant == "pressed" else Color.WHITE
+			b.add_theme_stylebox_override(variant,texture_style)
+	else:
+		b.add_theme_stylebox_override("normal",style(bg,16))
+		b.add_theme_stylebox_override("hover",style(bg.lightened(0.05),16))
+		b.add_theme_stylebox_override("pressed",style(bg.darkened(0.05),16))
+		b.add_theme_stylebox_override("focus",style(bg,16,Color("b0bafa"),2))
+	b.add_theme_stylebox_override("disabled",style(Color("e3e6f1"),16))
 	b.add_theme_color_override("font_disabled_color",MUTED)
 	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	b.pressed.connect(fn)
@@ -240,7 +254,7 @@ func reset_page(id: String, _nav: bool = false) -> void:
 	if id != "game": party_clock.stop()
 	if is_instance_valid(answer_timer): answer_timer.stop()
 	var bg = TextureRect.new()
-	bg.texture = load("res://assets/v2/"+("splash" if id == "loading" else "background")+".webp")
+	bg.texture = load("res://assets/v4/landscape.webp")
 	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -259,12 +273,13 @@ func reset_page(id: String, _nav: bool = false) -> void:
 	scroll.get_v_scroll_bar().value_changed.connect(func(_v): call_deferred("_position_web_input"))
 	var margin = MarginContainer.new()
 	margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	margin.add_theme_constant_override("margin_left",24)
-	margin.add_theme_constant_override("margin_right",24)
-	margin.add_theme_constant_override("margin_top",24)
+	margin.add_theme_constant_override("margin_left",20)
+	margin.add_theme_constant_override("margin_right",20)
+	margin.add_theme_constant_override("margin_top",20)
 	margin.add_theme_constant_override("margin_bottom",24)
 	scroll.add_child(margin)
 	page = box_to(margin,14)
+	page_root = page
 	page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var over = Control.new()
 	over.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -283,8 +298,53 @@ func center_label(parent: Node, value: String, pixels: int = 16, color: Color = 
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	return l
 
-func brand(parent: Node, height: int = 205, dark: bool = false) -> void:
-	art_to(parent,"logo_dark" if dark else "logo",Vector2(260,height))
+func brand(parent: Node, height: int = 180, _dark: bool = false) -> void:
+	var title = center_label(parent,"Sözcük\nZinciri",53,Color.WHITE,true)
+	title.custom_minimum_size.y = height
+	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	title.add_theme_constant_override("line_spacing",-12)
+	title.add_theme_color_override("font_shadow_color",Color(0.13,0.17,0.39,0.35))
+	title.add_theme_constant_override("shadow_offset_y",3)
+	title.add_theme_constant_override("shadow_offset_x",0)
+
+func sheet_to(parent: Node, separation: int = 14) -> VBoxContainer:
+	var p = panel_to(parent,Color.WHITE,24)
+	var st = p.get_theme_stylebox("panel").duplicate()
+	st.content_margin_top = 22
+	st.content_margin_bottom = 22
+	p.add_theme_stylebox_override("panel",st)
+	return box_to(p,separation)
+
+func currency_to(parent: Node) -> void:
+	var chip = panel_to(parent,Color.WHITE,12)
+	var st = chip.get_theme_stylebox("panel").duplicate()
+	st.content_margin_left = 9
+	st.content_margin_right = 12
+	st.content_margin_top = 4
+	st.content_margin_bottom = 4
+	chip.add_theme_stylebox_override("panel",st)
+	var h = row_to(chip,5)
+	image_to(h,"v4/gem",Vector2(30,30))
+	var amount = label_to(h,str(int(state.data.coins)),16,INK,true)
+	amount.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+
+func color_menu(parent: Node, title: String, icon_name: String, action: Callable, color: Color) -> void:
+	var b = button_to(parent,"",action,color,Color.WHITE,76)
+	var m = MarginContainer.new()
+	m.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	for edge in ["left","right"]: m.add_theme_constant_override("margin_"+edge,24)
+	m.add_theme_constant_override("margin_top",10)
+	m.add_theme_constant_override("margin_bottom",14)
+	m.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	b.add_child(m)
+	var h = row_to(m,16)
+	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	image_to(h,"v4/"+icon_name,Vector2(38,38))
+	var title_label = label_to(h,title,23,Color.WHITE,true)
+	title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	var arrow = label_to(h,"›",32,Color.WHITE)
+	arrow.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 
 func menu_button(parent: Node, title: String, icon_name: String, action: Callable, description: String = "") -> Button:
 	var button = button_to(parent,"",action,Color.WHITE,PURPLE,72 if not description.is_empty() else 62)
@@ -310,37 +370,66 @@ func menu_button(parent: Node, title: String, icon_name: String, action: Callabl
 
 func show_categories() -> void:
 	reset_page("categories")
-	header("Kategoriler",show_home)
-	gap(page,14)
-	center_label(page,"Hangi dünyaya adım atalım?",24,PURPLE,true)
-	center_label(page,"Kelimeler arasında küçük bir keşif.",14,MUTED)
-	gap(page,12)
-	menu_button(page,"Hepsi","chain",func(): filter_category = "Tümü"; show_levels(),"Tüm kelimeler · 24 bölüm")
-	for i in range(CATEGORIES.size()):
-		menu_button(page,CATEGORIES[i],["tea","leaf","book"][i],func(): filter_category = CATEGORIES[i]; show_levels(),str(category_done(CATEGORIES[i]))+" / 8 bölüm tamamlandı")
-	gap(page,12)
-	center_label(page,"Yeni bağlantılar keşfettikçe\nbölümler birer birer açılır.",14,MUTED)
+	header("Bölümler",show_home)
+	center_label(page,"Keşif rotanı seç",23,INK,true)
+	var colors = [Color("d6eee5"),Color("d6e7fc"),Color("fce0d7"),Color("e3dafa")]
+	for i in range(4):
+		var category = CATEGORIES[i] if i < 3 else "Tümü"
+		var count = category_done(category) if i < 3 else state.data.completed.size()
+		var total = 8 if i < 3 else 24
+		var b = button_to(page,"",func(): filter_category = category; show_levels(),colors[i],INK,100)
+		var m = MarginContainer.new()
+		m.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		for edge in ["left","right"]: m.add_theme_constant_override("margin_"+edge,18)
+		m.add_theme_constant_override("margin_top",14)
+		m.add_theme_constant_override("margin_bottom",14)
+		m.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		b.add_child(m)
+		var h = row_to(m,12)
+		h.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var v = box_to(h,7)
+		v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		label_to(v,category if i < 3 else "Tüm Bölümler",21,INK,true)
+		var r = row_to(v,14)
+		label_to(r,str(count)+" / "+str(total),14,BLUE,true)
+		var progress = ProgressBar.new()
+		progress.max_value = total
+		progress.value = count
+		progress.show_percentage = false
+		progress.custom_minimum_size = Vector2(100,10)
+		progress.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		progress.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		progress.add_theme_stylebox_override("background",track_style(Color("bbc3d9")))
+		progress.add_theme_stylebox_override("fill",track_style(TEAL))
+		r.add_child(progress)
+		var arrow = label_to(h,"›",35,INK)
+		arrow.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	center_label(page,"Kolay bağlantılardan zor zincirlere.",13,MUTED)
 
 func header(title: String = "", back: Callable = Callable()) -> void:
-	var h = row_to(page)
+	var h = row_to(page_root,10)
 	if back.is_valid():
-		var b = button_to(h,"←",back,Color.WHITE,PURPLE,46)
+		var b = button_to(h,"‹",back,BLUE,Color.WHITE,42)
 		b.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-		b.custom_minimum_size.x = 46
-		b.add_theme_font_size_override("font_size",26)
-		for state_name in ["normal","hover","pressed","focus"]:
-			var back_style = b.get_theme_stylebox(state_name).duplicate()
-			back_style.content_margin_left = 0
-			back_style.content_margin_right = 0
-			b.add_theme_stylebox_override(state_name,back_style)
+		b.custom_minimum_size.x = 42
+		b.add_theme_font_size_override("font_size",32)
+		for variant in ["normal","hover","pressed","focus"]:
+			var st = b.get_theme_stylebox(variant).duplicate()
+			st.content_margin_left = 0
+			st.content_margin_right = 0
+			st.content_margin_top = 0
+			st.content_margin_bottom = 0
+			b.add_theme_stylebox_override(variant,st)
 		b.tooltip_text = "Geri dön"
-	var l = label_to(h,title,20,INK,true)
+	var l = label_to(h,title,19,Color.WHITE,true)
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	l.clip_text = true
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	var coin = panel_to(h,Color("fff0bb"),16)
-	label_to(coin,"●  "+str(int(state.data.coins)),16,Color("8a641c"),true)
+	currency_to(h)
+	if screen != "game": page = sheet_to(page_root)
 
 func show_loading() -> void:
 	reset_page("loading")
@@ -403,6 +492,7 @@ func _web_input_changed(args: Array) -> void:
 	if action == "focus":
 		if not field.has_meta("tile_input"):
 			field.add_theme_stylebox_override("normal",style(Color.WHITE,20,PURPLE,2))
+		call_deferred("_reveal_web_focus",field)
 		return
 	if action == "blur":
 		if not field.has_meta("tile_input"):
@@ -414,20 +504,26 @@ func _web_input_changed(args: Array) -> void:
 	field.text_changed.emit(field.text)
 	if action == "submit": field.text_submitted.emit(field.text)
 
+func _reveal_web_focus(field: LineEdit) -> void:
+	await get_tree().process_frame
+	if not is_instance_valid(field) or not is_instance_valid(scroll): return
+	scroll.ensure_control_visible(tile_area if field.has_meta("tile_input") and is_instance_valid(tile_area) else field)
+	await get_tree().process_frame
+	_position_web_input()
+
 func show_profile_setup() -> void:
 	reset_page("onboarding")
-	gap(page,60)
-	brand(page,220)
-	center_label(page,"Kelimeleri birbirine bağla,\nkendi zincirini tamamla.",17,INK,true)
-	gap(page,42)
+	gap(page,30)
+	brand(page,180)
+	page = sheet_to(page_root,16)
+	center_label(page,"Birlikte başlayalım",25,INK,true)
+	center_label(page,"Kelimeleri birbirine bağla,\nkendi zincirini tamamla.",16,MUTED)
 	profile_name = create_entry(page,"Kullanıcı adını yaz…",16)
 	profile_name.text = str(state.data.name)
-	var go = button_to(page,"Devam Et     →",_finish_profile,PURPLE,Color.WHITE,60)
+	var go = button_to(page,"Devam Et     ›",_finish_profile,TEAL,Color.WHITE,60)
 	go.disabled = profile_name.text.strip_edges().length() < 2
-	profile_name.text_changed.connect(func(s): go.disabled = s.strip_edges().length() < 2)
-	profile_name.text_submitted.connect(func(_s): _finish_profile())
-	gap(page,30)
-	center_label(page,"Sadece bir isim, sonra oyuna hazırsın.",14,MUTED)
+	profile_name.text_changed.connect(func(value): go.disabled = value.strip_edges().length() < 2)
+	profile_name.text_submitted.connect(func(_value): _finish_profile())
 	center_label(page,"İlerlemen bu cihazda saklanır.",12,MUTED)
 
 func _finish_profile() -> void:
@@ -440,20 +536,18 @@ func _finish_profile() -> void:
 
 func show_tutorial_intro() -> void:
 	reset_page("tutorial_intro")
-	if state.data.tutorial: header("Nasıl oynanır?",show_profile)
-	brand(page,150)
-	center_label(page,"Bir sözcük diğerini açar.",26,PURPLE,true)
-	var card = panel_to(page,Color.WHITE)
+	header("Nasıl oynanır?",show_profile if state.data.tutorial else Callable())
+	center_label(page,"Bir sözcük diğerini açar.",25,INK,true)
+	var card = panel_to(page,LILAC)
 	var v = box_to(card,12)
-	center_label(v,"SU  →  B A R D A Ğ I",23,PURPLE,true)
+	center_label(v,"SU  →  B A R D A Ğ I",22,BLUE,true)
 	center_label(v,"Su bardağı! İlk harf bizden.\nKutulara dokun, ARDAĞI yaz.",16,INK)
 	center_label(v,"BARDAĞI   →   BARDAK",21,PURPLE,true)
 	center_label(v,"Doğru sözcük köküne dönüşür.\nSonra bardak altlığıyla devam edersin.",15,MUTED)
-	gap(page,8)
-	label_to(page,"01    İlk kutuya dokun, kalan harfleri yaz.",15,INK,true)
+	label_to(page,"01    Kutulara dokun, kalan harfleri yaz.",15,INK,true)
 	label_to(page,"02    Doğru cevapta otomatik devam et.",15,INK,true)
 	label_to(page,"03    Takılırsan harf veya ipucu kullan.",15,INK,true)
-	button_to(page,"Hadi Deneyelim     →",func(): start_level(1,"tutorial"))
+	button_to(page,"Hadi Deneyelim     ›",func(): start_level(1,"tutorial"),TEAL)
 	center_label(page,"Öğreticide bütün jokerler ücretsiz.",12,MUTED)
 
 func next_level_id() -> int:
@@ -469,51 +563,27 @@ func category_done(category: String) -> int:
 
 func show_home() -> void:
 	reset_page("home")
-	var h = row_to(page,9)
-	var profile = button_to(h,"",show_profile,Color.TRANSPARENT,PURPLE,46)
-	profile.custom_minimum_size.x = 44
-	profile.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	var user_art = art_to(profile,"icon_user",Vector2.ZERO)
-	user_art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var identity = box_to(h,1)
-	identity.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	label_to(identity,str(state.data.name),14,INK,true)
-	label_to(identity,"Seviye "+str(1+int(state.data.completed.size()/4)),11,MUTED)
-	var coin = panel_to(h,Color.WHITE,22)
-	var coin_row = row_to(coin,5)
-	art_to(coin_row,"icon_coin",Vector2(22,22))
-	label_to(coin_row,str(int(state.data.coins)),15,INK,true)
-	var settings = button_to(h,"",show_profile,Color.WHITE,PURPLE,46)
-	settings.custom_minimum_size.x = 46
-	settings.size_flags_horizontal = Control.SIZE_SHRINK_END
-	var gear = art_to(settings,"icon_gear",Vector2.ZERO)
-	gear.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	gear.offset_left = 10
-	gear.offset_right = -10
-	gear.offset_top = 10
-	gear.offset_bottom = -10
-	gap(page,14)
-	brand(page,220)
-	center_label(page,"Bir kelimeyle başla, bağlantıyı keşfet.",14,MUTED)
+	var h = row_to(page,8)
+	var identity = button_to(h,str(state.data.name),show_profile,BLUE,Color.WHITE,36)
+	identity.add_theme_font_size_override("font_size",14)
+	identity.clip_text = true
+	identity.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	currency_to(h)
+	gap(page,12)
+	brand(page,162)
 	gap(page,12)
 	var next = next_level_id()
-	menu_button(page,"Tek Oyunculu","play",func(): start_level(next),"Bölüm "+str(int(level_by_id[next].order))+" · "+level_by_id[next].difficulty)
-	menu_button(page,"Çok Oyunculu","versus",show_online)
-	menu_button(page,"Parti Modu","party",show_party_setup)
-	var bottom = row_to(page,14)
-	for info in [["Kategoriler","folder",show_categories],["Ayarlar","gear",show_profile]]:
-		var b = button_to(bottom,"",info[2],Color.WHITE,INK,96)
-		var margin = MarginContainer.new()
-		margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		margin.add_theme_constant_override("margin_top",12)
-		margin.add_theme_constant_override("margin_bottom",12)
-		margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		b.add_child(margin)
-		var v = box_to(margin,5)
-		v.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		art_to(v,"icon_"+info[1],Vector2(30,30))
-		center_label(v,info[0],15,INK,true)
-	center_label(page,"Her gün yeni bağlantılar kur.",12,MUTED)
+	color_menu(page,"Tek Kişilik","user",func(): start_level(next),TEAL)
+	color_menu(page,"Parti Modu","party",show_party_setup,PURPLE)
+	color_menu(page,"1’e 1 Yarışma","versus",show_online,CORAL)
+	gap(page,18)
+	var bottom = row_to(page,12)
+	button_to(bottom,"Bölümler",show_categories,BLUE,Color.WHITE,48)
+	var settings = button_to(bottom,"Ayarlar",show_profile,BLUE,Color.WHITE,48)
+	settings.icon = load("res://assets/v4/gear.webp")
+	settings.expand_icon = true
+	settings.add_theme_constant_override("icon_max_width",22)
+	center_label(page,"Bir sözcükle başla, bağlantıyı keşfet.",13,Color.WHITE)
 
 func category_card(i: int) -> void:
 	menu_button(page,CATEGORIES[i],["tea","leaf","book"][i],func(): filter_category = CATEGORIES[i]; show_levels())
@@ -540,8 +610,8 @@ func show_levels() -> void:
 			var id = int(level.id)
 			var done = id in state.data.completed
 			var unlocked = j == 0 or category_levels[j-1].id in state.data.completed or done
-			var b = button_to(grid,str(int(level.order))+(" ✓" if done else ""),func(): start_level(id),LILAC if done else Color.WHITE,PURPLE,72)
-			b.custom_minimum_size.x = 80
+			var b = button_to(grid,str(int(level.order))+(" ✓" if done else ""),func(): start_level(id),Color("d6eee5") if done else LILAC,BLUE,64)
+			b.custom_minimum_size.x = 65
 			b.disabled = not unlocked
 			b.tooltip_text = "Tekrar oyna" if done else "Önceki bölümü tamamla" if not unlocked else str(level.difficulty)
 	center_label(page,"Her kategorinin ilk bölümü açık.\nÇözdükçe yeni bağlantılara ulaşırsın.",13,MUTED)
@@ -581,94 +651,103 @@ func leave_game() -> void:
 func show_game(message: String = "", keep_input: bool = false) -> void:
 	if keep_input and screen == "game" and is_instance_valid(entry):
 		answer_timer.stop()
-		for child in page.get_children():
-			page.remove_child(child)
+		for child in page_root.get_children():
+			page_root.remove_child(child)
 			child.queue_free()
+		page = page_root
 	else:
 		reset_page("game")
 		entry = null
-	header("Öğretici" if mode == "tutorial" else party_names[party_index % party_names.size()] if mode == "party" else "Bölüm "+str(int(current.order)),leave_game)
-	var top = row_to(page)
-	var cat = label_to(top,current.difficulty+" · "+current.category,13,PURPLE,true)
+	header("Öğretici" if mode == "tutorial" else party_names[party_index % party_names.size()] if mode == "party" else current.category,leave_game)
+	var top = row_to(page_root)
+	var cat = label_to(top,"Seviye "+str(int(current.order))+" · "+current.difficulty,13,Color.WHITE,true)
 	cat.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	if mode == "party": clock_label = label_to(top,str(party_remaining)+" sn",15,PURPLE,true)
-	else: label_to(top,str(cursor)+" / "+str(current.words.size()-1)+" bağlantı",13,MUTED)
-	center_label(page,"Bağlantıyı bul!",27,PURPLE,true)
-	if mode == "tutorial":
-		var guide = panel_to(page,Color("fff2ce"),20)
-		label_to(guide,["","Su bardağı → B hazır. ARDAĞI yaz.","Bardak altlığı → A hazır. LTLIĞI yaz.","Altlık kumaşı → K hazır. UMAŞI yaz."][mini(cursor,3)],14,INK,true)
-	else: center_label(page,"İlk harf bizden. Kalanı senden.",14,MUTED)
-	var progress = ProgressBar.new()
-	progress.max_value = current.words.size()-1
-	progress.value = cursor-1
-	progress.show_percentage = false
-	progress.custom_minimum_size.y = 5
-	progress.add_theme_stylebox_override("background",track_style(LILAC))
-	progress.add_theme_stylebox_override("fill",track_style(PURPLE))
-	page.add_child(progress)
-	var chain = box_to(page,5)
-	active_tiles.clear()
-	tile_panels.clear()
+	if mode == "party": clock_label = label_to(top,str(party_remaining)+" sn",14,Color.WHITE,true)
+	else: label_to(top,str(cursor)+" / "+str(current.words.size()-1)+" bağlantı",13,Color.WHITE)
+	var progress_shell = panel_to(page_root,Color("f1f2fc"),24)
+	var steps = row_to(progress_shell,8)
+	steps.alignment = BoxContainer.ALIGNMENT_CENTER
 	for i in range(current.words.size()):
 		if i > 0:
-			center_label(chain,"•",10,Color("b6a2ff"))
-		var solved = i < cursor
-		var active = i == cursor
-		var p = panel_to(chain,Color.WHITE if solved else LILAC if active else Color("f8f5ff"),20)
+			var line = ColorRect.new()
+			line.color = TEAL if i < cursor else Color("bac3df")
+			line.custom_minimum_size = Vector2(22,3)
+			line.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			steps.add_child(line)
+		var dot = panel_to(steps,TEAL if i < cursor else Color("a6afd1"),12)
+		dot.custom_minimum_size = Vector2(17,17)
+		var st = dot.get_theme_stylebox("panel").duplicate()
+		for side in [SIDE_LEFT,SIDE_RIGHT,SIDE_TOP,SIDE_BOTTOM]: st.set_content_margin(side,0)
+		dot.add_theme_stylebox_override("panel",st)
+	page = sheet_to(page_root,14)
+	var chain = row_to(page,6)
+	for i in range(current.words.size()):
+		var col = box_to(chain,5)
+		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		col.size_flags_stretch_ratio = 1
+		var caption = center_label(col,str(i+1)+". Kelime",11,PURPLE if i == cursor else MUTED,true)
+		caption.autowrap_mode = TextServer.AUTOWRAP_OFF
+		var p = panel_to(col,Color("d7eee7") if i < cursor else LILAC,14)
 		var st = p.get_theme_stylebox("panel").duplicate()
-		st.content_margin_top = 10 if active else 7
-		st.content_margin_bottom = 10 if active else 7
+		st.content_margin_left = 3
+		st.content_margin_right = 3
+		st.content_margin_top = 12
+		st.content_margin_bottom = 12
+		if i == cursor:
+			st.bg_color = Color.WHITE
+			st.border_color = PURPLE
+			st.set_border_width_all(2)
 		p.add_theme_stylebox_override("panel",st)
-		var b = box_to(p,5)
-		if solved:
-			var r = row_to(b)
-			var word = label_to(r,current.words[i],22,PURPLE,true)
-			word.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			label_to(r,"BAŞLANGIÇ" if i == 0 else "✓",10,PURPLE,true)
-			if i > 0: label_to(b,current.links[i-1],11,MUTED)
-		elif active:
-			active_card = p
-			tile_area = row_to(b,5)
-			tile_area.alignment = BoxContainer.ALIGNMENT_CENTER
-			var surface = WordRules.form(current,i)
-			for j in range(surface.length()):
-				var tile = PanelContainer.new()
-				tile.custom_minimum_size = Vector2(31 if surface.length() > 7 else 36,48)
-				tile.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-				var tile_style = style(Color.WHITE,11,PURPLE if j == 0 else Color("d7caff"),2 if j == 0 else 1)
-				tile_style.content_margin_left = 0
-				tile_style.content_margin_right = 0
-				tile_style.content_margin_top = 0
-				tile_style.content_margin_bottom = 0
-				tile.add_theme_stylebox_override("panel",tile_style)
-				tile_area.add_child(tile)
-				var l = label_to(tile,surface[j] if j in revealed else "",23,PURPLE,true)
-				l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-				l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-				active_tiles.append(l)
-				tile_panels.append(tile)
-			center_label(b,"Kutulara dokun · Kalan harfleri yaz",11,PURPLE)
-		else:
-			center_label(b,"•  •  •",16,Color("c3b6dc"),true)
+		var shown = str(current.words[i]) if i < cursor else WordRules.form(current,i)[0]+" _ _" if i == cursor else "— —"
+		var word = center_label(p,shown,13,BLUE,true)
+		word.autowrap_mode = TextServer.AUTOWRAP_OFF
+		word.clip_text = true
+		word.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	var prompt = panel_to(page,LILAC,16)
+	center_label(prompt,str(cursor+1)+". kelimeyi tahmin et",17,BLUE,true)
+	center_label(page,str(current.words[cursor-1])+"  →  ?",22,INK,true)
+	active_card = panel_to(page,Color("f7f7ff"),18)
+	var active = box_to(active_card,7)
+	active_tiles.clear()
+	tile_panels.clear()
+	tile_area = row_to(active,4)
+	tile_area.alignment = BoxContainer.ALIGNMENT_CENTER
+	var surface = WordRules.form(current,cursor)
+	for j in range(surface.length()):
+		var tile = PanelContainer.new()
+		tile.custom_minimum_size = Vector2(24 if surface.length() > 8 else 29,46)
+		tile.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var tile_style = style(Color.WHITE,10,PURPLE if j == 0 else Color("d4dbef"),2 if j == 0 else 1)
+		for side in [SIDE_LEFT,SIDE_RIGHT,SIDE_TOP,SIDE_BOTTOM]: tile_style.set_content_margin(side,0)
+		tile.add_theme_stylebox_override("panel",tile_style)
+		tile_area.add_child(tile)
+		var letter = label_to(tile,surface[j] if j in revealed else "",22,BLUE,true)
+		letter.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		letter.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		active_tiles.append(letter)
+		tile_panels.append(tile)
+	center_label(active,"Kutulara dokun · Kalan harfleri yaz",11,MUTED)
 	if entry == null:
 		entry = create_entry(self,"Harf kutuları",40)
 		entry.set_meta("tile_input",true)
 		entry.modulate.a = 0.0
-		entry.text_submitted.connect(func(_v): submit_answer())
+		entry.text_submitted.connect(func(_value): submit_answer())
 		entry.text_changed.connect(update_tiles)
 	var hint_key = str(cursor)
+	if mode == "tutorial":
+		center_label(page,["","Su bardağı → B hazır. ARDAĞI yaz.","Bardak altlığı → A hazır. LTLIĞI yaz.","Altlık kumaşı → K hazır. UMAŞI yaz."][mini(cursor,3)],13,BLUE,true)
 	if clues.has(hint_key):
-		var bubble = panel_to(page,Color("fff2ce"),20)
+		var bubble = panel_to(page,Color("fff0c5"),16)
 		label_to(bubble,current.hints[cursor],14,INK)
-	feedback = center_label(page,message if not message.is_empty() else "Doğru sözcükte otomatik devam eder.",12,GREEN if not message.is_empty() else MUTED)
+	feedback = center_label(page,message if not message.is_empty() else "İlk harf bizden. Kalanı senden.",12,GREEN if not message.is_empty() else MUTED)
 	var hint_row = row_to(page,10)
 	var price_letter = "Ücretsiz" if mode == "tutorial" else "15 altın" if mode == "solo" else "−10 puan"
 	var price_clue = "Ücretsiz" if mode == "tutorial" else "10 altın" if mode == "solo" else "−5 puan"
-	var lb = button_to(hint_row,"Harf Al · "+price_letter,reveal_letter,Color.WHITE,PURPLE,48)
-	lb.add_theme_font_size_override("font_size",13)
-	var cb = button_to(hint_row,"İpucu · "+price_clue,reveal_clue,Color.WHITE,PURPLE,48)
-	cb.add_theme_font_size_override("font_size",13)
+	var cb = button_to(hint_row,"İpucu Ver\n"+price_clue,reveal_clue,YELLOW,INK,64)
+	cb.add_theme_font_size_override("font_size",15)
 	cb.disabled = clues.has(hint_key)
+	var lb = button_to(hint_row,"Harf Al\n"+price_letter,reveal_letter,PURPLE,Color.WHITE,64)
+	lb.add_theme_font_size_override("font_size",15)
 	busy = false
 	if OS.has_feature("web"):
 		web_input.setWord(int(current.id),cursor,str(current.words[cursor-1]),WordRules.form(current,cursor)[0],WordRules.form(current,cursor).length())
@@ -804,29 +883,30 @@ func reveal_clue() -> void:
 
 func show_win(rewarded: bool) -> void:
 	reset_page("win")
-	gap(page,16)
-	var tag = label_to(page,"BAĞLANTILAR TAMAM!",13,PURPLE,true)
-	tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	brand(page,190)
-	var title = label_to(page,"İşte bu, zincir tamam!",29,INK,true)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var sub = label_to(page,"Artık hazırsın. Kendi keşif rotanı seç!" if mode == "tutorial" else "Bir sözcükten kocaman bir keşfe.",16,MUTED)
-	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var summary = panel_to(page,LILAC)
-	var v = box_to(summary,8)
-	for phrase in current.links:
-		var l = label_to(v,"✓  "+phrase,17,PURPLE,true)
-		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	gap(page,68)
+	page = sheet_to(page_root,18)
+	center_label(page,"Seviye Tamamlandı!",27,BLUE,true)
+	var stars = row_to(page,4)
+	stars.alignment = BoxContainer.ALIGNMENT_CENTER
+	for i in range(3): image_to(stars,"v4/star",Vector2(80,92 if i == 1 else 78))
+	var category = panel_to(page,LILAC,17)
+	var category_box = box_to(category,3)
+	center_label(category_box,"Öğretici" if mode == "tutorial" else current.category,20,BLUE,true)
+	center_label(category_box,"Artık oyuna hazırsın!" if mode == "tutorial" else "Seviye "+str(int(current.order)),14,MUTED)
 	if mode != "tutorial":
-		var reward = panel_to(page,Color("fff0c4"),18)
-		var l = label_to(reward,"+25 altın  ·  Çok iyi iş!" if rewarded else "Bu zinciri daha önce tamamladın.",18,Color("8a641c"),true)
-		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	gap(page,4)
-	if mode == "tutorial": button_to(page,"Keşfe başla   →",show_home)
+		var reward = panel_to(page,LILAC,17)
+		var h = row_to(reward,7)
+		h.alignment = BoxContainer.ALIGNMENT_CENTER
+		if rewarded: image_to(h,"v4/gem",Vector2(36,36))
+		var amount = label_to(h,"+"+str(GameState.REWARD) if rewarded else "Daha önce tamamlandı",27 if rewarded else 15,BLUE,true)
+		amount.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	center_label(page,"  ·  ".join(current.links),13,MUTED)
+	if mode == "tutorial": button_to(page,"Oyuna Başla     ›",show_home,TEAL,Color.WHITE,60)
 	else:
 		var number = int(current.order)
-		if number < levels.size(): button_to(page,"Sıradaki zincir   →",func(): start_level(int(levels[number].id)))
-		button_to(page,"Keşif rotana dön",show_levels,LILAC,PURPLE)
+		if number < levels.size(): button_to(page,"Sonraki Seviye     ›",func(): start_level(int(levels[number].id)),TEAL,Color.WHITE,60)
+		else: button_to(page,"Bölümlere Dön",show_levels,TEAL,Color.WHITE,60)
+	button_to(page,"Ana Menü",show_home,Color("e4e8f8"),INK,54)
 	confetti()
 
 func confetti() -> void:
@@ -848,7 +928,7 @@ func confetti() -> void:
 func show_party_setup() -> void:
 	reset_page("party_setup")
 	header("Parti modu",show_home)
-	art_to(page,"icon_party",Vector2(130,130))
+	art_to(page,"icon_party",Vector2(70,70))
 	label_to(page,"Telefonu sırayla paylaş.",29,INK,true)
 	label_to(page,"2–4 kişi, bolca kelime. Her oyuncuya 90 saniye ve farklı bir zincir. En çok puanı toplayan kazanır.",16,MUTED)
 	label_to(page,"Oyuncular",17,INK,true)
@@ -892,8 +972,8 @@ func begin_party() -> void:
 func show_party_handoff() -> void:
 	reset_page("party_handoff")
 	header("Tur "+str(int(party_index/party_names.size())+1)+" / "+str(party_rounds),func(): confirm_dialog("Partiden ayrıl?","Parti puanları kaydedilmez.",show_home))
-	gap(page,60)
-	art_to(page,"icon_party",Vector2(210,210))
+	gap(page,8)
+	art_to(page,"icon_party",Vector2(90,90))
 	var l = label_to(page,"Sıra sende,\n"+party_names[party_index % party_names.size()]+"!",33,INK,true)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label_to(page,"Telefonu bu oyuncuya ver. Hazır olduğunda 90 saniyelik süre başlayacak.",17,MUTED)
@@ -903,7 +983,7 @@ func show_party_handoff() -> void:
 func party_countdown() -> void:
 	reset_page("countdown")
 	gap(page,210)
-	var l = label_to(page,"3",100,PURPLE,true)
+	var l = label_to(page,"3",100,Color.WHITE,true)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	for n in [3,2,1]:
 		l.text = str(n)
@@ -922,8 +1002,8 @@ func _party_tick() -> void:
 func finish_party_turn(finished: bool) -> void:
 	DisplayServer.virtual_keyboard_hide()
 	reset_page("party_turn_end")
-	gap(page,55)
-	art_to(page,"icon_party",Vector2(190,190))
+	header("Parti Modu")
+	art_to(page,"icon_party",Vector2(72,72))
 	label_to(page,"Zincir tamam!" if finished else "Süre doldu!",32,INK,true)
 	var who = party_index % party_names.size()
 	label_to(page,party_names[who]+" · "+str(party_scores[who])+" toplam puan",22,PURPLE,true)
@@ -935,7 +1015,8 @@ func finish_party_turn(finished: bool) -> void:
 
 func show_party_results() -> void:
 	reset_page("party_results")
-	art_to(page,"icon_party",Vector2(200,200))
+	header("Parti Sonuçları",show_home)
+	image_to(page,"v4/star",Vector2(76,76))
 	var highest = party_scores.max()
 	var winners: Array = []
 	for i in range(party_names.size()):
@@ -954,19 +1035,22 @@ func show_party_results() -> void:
 
 func show_online() -> void:
 	reset_page("online")
-	header("1'e 1 yarış",show_home)
-	gap(page,24)
-	art_to(page,"icon_party",Vector2(180,180))
-	label_to(page,"Aynı anda,\naynı heyecan.",34,INK,true)
-	var note = panel_to(page,Color("fff0c4"))
-	label_to(note,"Çok yakında · Çevrim içi bağlantı henüz açık değil.",16,Color("8a641c"),true)
-	label_to(page,"Oda koduyla arkadaşınla eşleş, 3–2–1 sayımıyla başla ve rakibinin puanını canlı takip et.",17,MUTED)
-	var p = panel_to(page,LILAC)
-	var v = box_to(p,12)
-	label_to(v,"Birlikte yarışmaya hazırlanıyoruz",19,INK,true)
-	label_to(v,"•  Oda kurma ve kodla katılma\n•  Aynı zincir, eş zamanlı başlangıç\n•  Canlı skor ve kısa mesajlar",15,MUTED)
-	button_to(page,"Şimdilik yan yana oynayalım",show_party_setup)
-	button_to(page,"Keşfe dön",show_home,LILAC,PURPLE)
+	header("1’e 1 Yarışma",show_home)
+	var players = row_to(page,12)
+	for i in range(2):
+		var p = panel_to(players,Color("d6e7fc") if i == 0 else Color("ffe0e7"),18)
+		p.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var b = box_to(p,8)
+		center_label(b,"Sen" if i == 0 else "Rakip",17,BLUE,true)
+		center_label(b,"—",42,INK,true)
+	var note = panel_to(page,LILAC,20)
+	var v = box_to(note,14)
+	center_label(v,"Çok yakında",27,BLUE,true)
+	center_label(v,"Oda koduyla eşleş, aynı zincirde yarış.",16,MUTED)
+	center_label(v,"Çevrim içi bağlantı henüz açık değil.",14,INK,true)
+	label_to(page,"•  Oda kurma ve kodla katılma\n•  Eş zamanlı başlangıç ve canlı skor\n•  Oyun içi kısa mesajlar",15,MUTED)
+	button_to(page,"Şimdilik Parti Oynayalım",show_party_setup,TEAL,Color.WHITE,60)
+	button_to(page,"Ana Menü",show_home,LILAC,INK)
 
 func show_profile() -> void:
 	reset_page("profile")
@@ -1002,7 +1086,7 @@ func show_profile() -> void:
 		profile_name.text = draft,
 		("Açık" if state.data.motion else "Kapalı")+" · Değiştirmek için dokun")
 	menu_button(page,"Nasıl oynanır?","hint",show_tutorial_intro)
-	center_label(page,"Türkçe · Sürüm 3.0\nİlerlemen yalnızca bu cihazda saklanır.",12,MUTED)
+	center_label(page,"Türkçe · Sürüm 4.0\nİlerlemen yalnızca bu cihazda saklanır.",12,MUTED)
 
 func toast(message: String) -> void:
 	var panel = panel_to(overlay,PURPLE,18)

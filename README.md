@@ -1,6 +1,6 @@
 # Sözcük Zinciri
 
-Godot 4.7.2 ile Türkçe, dikey mobil kelime bulmaca. 24 bölüm, üç kategori, profil ve ilerleme kaydı, jokerler, oynanabilir öğretici ve aynı cihazda 2–4 kişilik parti modu. Sürüm 2: referanslara uygun mor-sarı tasarım, doğrudan kutulara yazma, ilk harfi tekrar yazmadan otomatik ilerleme ve “BARDAĞI → BARDAK” dönüşümü. Avatar seçimi yoktur.
+Godot 4.7.2 ile Türkçe, dikey mobil kelime bulmaca. 24 bölüm, üç kategori, profil ve ilerleme kaydı, jokerler, oynanabilir öğretici ve aynı cihazda 2–4 kişilik parti modu. Sürüm 4: gün batımı manzarası, beyaz paneller, turkuaz/mor/turuncu butonlar ve yatay zincir kartları. Kutulara doğrudan yazma, ilk harfi tekrar yazmadan otomatik ilerleme ve “BARDAĞI → BARDAK” dönüşümü korunur.
 
 ## Çalıştırma
 
@@ -29,3 +29,5 @@ python scripts/check_project.py godot
 Web giriş köprüsü `scripts/web_input.js` içindedir. Görünen bütün alanları Godot çizer; şeffaf DOM girdileri yalnızca cihazın klavyesi içindir. Aynı DOM alanı sonraki sözcüklerde korunur. `data/levels.json` içindeki `forms` ekli biçimleri, `words` ise kökleri tanımlar. Gelişigüzel ek kesme algoritması kullanılmaz.
 
 V3: joker sonrası görüntü/doğrulama aynı çözücüyü kullanır, i/ı klavye farkı tolere edilir. Bölümler sabit içerik kimlikleri korunarak `order` ile kolaydan zora sıralanır. Web'de bloklayan FPS beklemesi kaldırılmıştır. [Ölçüm raporu](docs/PERFORMANCE-V3.md).
+
+V4 görselleri, üretim briefleri, sıkıştırma boyutları ve tarayıcı kontrolleri: [V4 tasarım ve varlık notları](docs/ASSETS-V4.md). [Web sürümü](https://ardaisik99.github.io/sozcuk-zinciri/?v=4).
