@@ -2,22 +2,22 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c02g4vqrtve37"
-path="res://.godot/imported/tea.webp-355c9cbccc7814e193582998e50d49c2.ctex"
+uid="uid://dojw2moe7ea1m"
+path="res://.godot/imported/logo_dark.webp-b0703950701dec005b5005d9169f5433.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/tea.webp"
-dest_files=["res://.godot/imported/tea.webp-355c9cbccc7814e193582998e50d49c2.ctex"]
+source_file="res://assets/v2/logo_dark.webp"
+dest_files=["res://.godot/imported/logo_dark.webp-b0703950701dec005b5005d9169f5433.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.88
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1

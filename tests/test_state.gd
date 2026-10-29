@@ -32,8 +32,19 @@ func _initialize() -> void:
 		assert(level.words.size() in [4,5])
 		assert(level.links.size() == level.words.size()-1)
 		assert(level.hints.size() == level.words.size())
+		assert(level.forms.size() == level.words.size())
+		for index in range(1,level.words.size()):
+			assert(WordRules.matches(level.forms[index],level,index))
+			assert(WordRules.matches(level.forms[index].substr(1),level,index))
+			assert(WordRules.matches(level.words[index],level,index))
+			assert(WordRules.matches(level.links[index-1],level,index))
 		for word in level.words:
 			assert(word == GameState.upper_tr(word))
 			assert(word.length() >= 2 and word.length() <= 8)
+	var box = {"words":["BİR","KUTU"],"forms":["BİR","KUTU"],"links":["Bir kutu"]}
+	assert(WordRules.matches("utu",box,1))
+	assert(not WordRules.matches("kutuş",box,1))
+	assert(not WordRules.matches("deniz bardağı",levels[0],1))
+	assert(WordRules.display("ardağı","BARDAĞI",[0]) == "BARDAĞI")
 	print("PASS: Turkish casing, insufficient balance, 24 valid chains.")
 	quit()

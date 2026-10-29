@@ -1,14 +1,16 @@
 # Sözcük Zinciri — Oyun tasarımı
 
-## İlk sürüm
+## Sürüm 2
 
 Godot 4.7.2, GDScript, Compatibility renderer. İlk teslim web içindir; Android ve iOS için dikey Control yerleşimi ve yerel klavye kullanımı korunur. Bu sürüm yalnızca Türkçedir.
 
-Yükleme → yerel profil → kısa açıklama → oynanabilir öğretici → ana menü. Sonraki açılışlarda profil ve öğretici geçilir. Öğreticide ÇAY → KAŞIK → OYUN → HAVA zinciri ücretsiz jokerlerle oynanır.
+Yükleme → kullanıcı adı → kısa açıklama → oynanabilir öğretici → ana menü. Profil resmi ve avatar seçimi kaldırılmıştır. Sonraki açılışlarda profil ve öğretici geçilir. Öğreticide SU → BARDAK → ALTLIK → KUMAŞ zinciri ücretsiz jokerlerle oynanır.
 
 ## Oynanış
 
-24 editoryal bölüm, 3 kategori: Mutfak, Doğa, Günlük Yaşam. Bölümler 4 veya 5 sözcük içerir. Önceki sözcük ile sıradaki sözcük bir isim tamlaması veya yerleşik ifade oluşturur. Cevap ek almadan yalın sözcük olarak girilir. Bitişte bütün bağlantıların doğru biçimleri gösterilir: çay kaşığı, kaşık oyunu, oyun havası.
+24 editoryal bölüm, 3 kategori: Mutfak, Doğa, Günlük Yaşam. Bölümler 4 veya 5 sözcük içerir. Önceki sözcük ile sıradaki sözcük bir isim tamlaması veya yerleşik ifade oluşturur. Cevap doğrudan harf kutularına yazılır. İlk harfi tekrar yazmak gerekmez. Örneğin B hazırken ARDAĞI yazmak yeterlidir. Ekli biçim BARDAĞI, kısa bir harf animasyonuyla BARDAK köküne dönüşür ve sonraki bağlantı bardak altlığı olur. Tam ekli sözcük, yalnızca eksik devamı, yalın kök veya tam doğru tamlama kabul edilir. Keyfi ek kesilmez: bütün dönüşümler `forms` ve `words` alanlarında tanımlıdır.
+
+Doğru girişten 240 ms sonra doğrulama başlar. Harfler sırayla hafifçe büyür; ek harfleri kaybolur, yumuşamış harfler köke döner. Animasyon yaklaşık 600 ms sürer. Cevap alanı ve klavye odağı aynı kalır; sonraki kelime için tekrar dokunulmaz. Ayrı bir cevap kutusu ve kontrol düğmesi yoktur. Klavyenin gönder/ileri tuşu da doğrular. Animasyon tercihi kapalıysa dönüşüm anlıktır.
 
 İlk sözcük açık, sıradaki sözcüğün ilk harfi ve uzunluğu görünür. Sonraki kartlar, önceki kelimenin çözülmesini bekler. Hatalı tahminler altın veya can tüketmez. Türkçe i/İ ve ı/I dönüşümleri ayrı ele alınır. Başta ve sonda kalan boşluklar temizlenir; yanlış harfler otomatik olarak doğru cevaba dönüştürülmez.
 
@@ -29,7 +31,7 @@ Yetersiz bakiyede işlem yapılmaz. Açılmış ipucu tekrar ücretlendirilmez. 
 
 ## Yerel kayıt
 
-`user://progress.json`: şema sürümü, ad, avatar, öğretici durumu, altın, tamamlanan bölümler, devam edilen zincirlerin adımı/açık harfleri/ipucu durumu ve animasyon tercihi. Her ekonomik işlem, tamamlanma ve profil değişikliğinde kaydedilir. Web'de Godot'un IndexedDB dosya sistemi kullanılır. Tarayıcı verileri silinirse veya gizli oturum kullanılırsa kayıt kaybolabilir. Veriler cihazlar arasında senkronize edilmez.
+`user://progress.json`: şema ve içerik sürümü, ad, öğretici durumu, altın, tamamlanan bölümler, devam edilen zincirlerin adımı/açık harfleri/ipucu durumu ve animasyon tercihi. V1'den geçişte kazanılmış altın ve tamamlanan bölümler korunur; eski harf maskeleri yeni ekli biçimlerle çakışmaması için sıfırlanır. Her ekonomik işlem, tamamlanma ve profil değişikliğinde kaydedilir. Web'de Godot'un IndexedDB dosya sistemi kullanılır. Tarayıcı verileri silinirse veya gizli oturum kullanılırsa kayıt kaybolabilir. Veriler cihazlar arasında senkronize edilmez.
 
 ## Parti modu
 
@@ -45,17 +47,19 @@ Sonraki uygulama: oda kodu, sunucu tarafından belirlenen ortak zincir, ortak ba
 
 ## Görsel sistem
 
-Kırık beyaz `#FAF7F0`, mor `#7654BF`, lila `#EEE7F8`, sarı `#F8D875`, mercan `#EF9277`, koyu metin `#35264C`. Nunito değişken fontu, SIL Open Font License. Büyük başlıklar 28–34, kelime kutuları 23, gövde 14–17 mantıksal piksel. Normal butonlar 48–58 piksel. Köşeler 16–26 piksel. Bulanıklık, ekran yakalama shader'ı, gerçek zamanlı ışık ve pahalı gölge yoktur.
+Referanslardaki organik kenar formları, canlı mor `#6038EF`, lila `#F0EBFF`, altın sarısı `#FFCA58`, beyaz `#FFFEFA` ve koyu mor metin `#292060` kullanılır. Bütün ekranlar aynı arka plan, kart, başlık ve ikon ailesini paylaşır. Nunito değişken fontu, SIL Open Font License. Büyük başlıklar 26–30, kelime kutuları 23, gövde 14–17 mantıksal piksel. Butonlar 48–62 piksel. Köşeler 18–22 piksel. Bulanıklık, ekran yakalama shader'ı, gerçek zamanlı ışık ve pahalı gölge yoktur.
 
-Özgün maskot ve dört kategori/parti çizimi, yerleşik imagegen ile üretilmiş bitmap varlıklardır. Temel brief: “ivory background, flat playful pastel illustration, dark plum outlines, purple/yellow/coral palette, crisp edges, no text, no blur”. Kaynaklar `assets/mascot.webp`, `tea.webp`, `plant.webp`, `book.webp`, `party.webp`; font lisansı `assets/FONT-LICENSE.txt`.
+Kuş ve eski çizimler kaldırılmıştır. Yeni açık/koyu arka planlar, şeffaf Sözcük Zinciri logosu ve 12 simge yerleşik imagegen ile üretilmiştir. Dosyalar `assets/v2/` klasöründedir. [Görsel üretim notları](ASSETS-V2.md). Font lisansı `assets/FONT-LICENSE.txt`.
 
 ## Performans bütçesi
 
 Oyun yalnızca 2D Control düğümleri kullanır. 30 FPS üst sınır; oyun mantığında sürekli `_process` veya fizik döngüsü yoktur. Sayaç yalnızca parti oynanırken saniyede bir çalışır. Konfeti 22 basit dörtgenden oluşur; kısa sürede temizlenir ve profil üzerinden kapatılabilir. Ekranlar değiştirilirken önceki düğümler ve animasyonlar temizlenir.
 
-Maskot 480×480, küçük çizimler 192×192, şeffaf WebP. Görsel kaynaklarının toplamı yaklaşık 66 KB; Nunito fontu yaklaşık 270 KB. Ok ve onay işaretleri için küçük bir DejaVu Sans alt kümesi kullanılır. Kaynak görsellerin büyük üretim dosyaları dağıtıma dahil edilmez. Yazı ve butonlar motorun yerel UI bileşenleridir; bir ekran görüntüsü olarak paketlenmez. Web'de giriş alanları native HTML input ve JavaScriptBridge ile Godot'a bağlanır; mobilde cihazın klavyesi doğrudan kullanıcı dokunuşuyla açılır. Masaüstü ve mobil IME girişleri de bu alanlardan geçer.
+Arka planlar 512×768, simgeler 96×96, logo en fazla 600×440 WebP. Küçük arka planlar yaklaşık 6 ve 11 KB'dır. Godot texture import sıkıştırması kayıplı WebP, kalite 0.88; mipmap yoktur. Nunito yaklaşık 270 KB. Ok ve onay işaretleri için küçük bir DejaVu Sans alt kümesi kullanılır. Büyük üretim PNG'leri dağıtıma dahil edilmez. Yazı ve butonlar motorun yerel UI bileşenleridir; ekran görüntüsü olarak paketlenmez.
 
-Web: single-thread export, GDExtension kapalı, VRAM sıkıştırma kapalı, ek CDN veya çalışma zamanı ağı yok. GitHub Pages'te özel COOP/COEP başlığı gerektirmez. Godot WebAssembly motoru ayrıca indirilir; bu boyut oyun çizimleriyle karıştırılmamalıdır. Motor 39.514.754 bayt; gzip aktarımı 10.054.758 bayttır. GitHub Pages özel sıkıştırma başlıkları sunmadığından modern tarayıcılarda DecompressionStream kullanılarak sıkıştırılmış motor akış hâlinde açılır ve WebAssembly derlemesine verilir. Bu API olmayan eski tarayıcılarda standart WASM dosyasına dönülür. Oyun PCK paketi yaklaşık 450 KB. Daha küçük motor gerekirse sonraki aşamada 3D ve kullanılmayan modüller kapatılarak özel export template derlenebilir.
+Kaydırma çubukları hem Godot'ta hem HTML'de gizlidir; kaydırma çalışır. Görünen bütün metin kutularını Godot çizer. HTML input'lar şeffaf klavye alanlarıdır; böylece kaydırırken ikinci bir kutu ve metin katmanı görünmez. Yalnızca kaydırma/boyut değişimi olaylarında konum güncellenir. Oyun sırasında aynı input sözcükler arasında korunur. Klavye açıldığında harf satırı görünür alana kaydırılır.
+
+Web: single-thread export, GDExtension kapalı, VRAM sıkıştırma kapalı, ek CDN veya çalışma zamanı ağı yok. GitHub Pages'te özel COOP/COEP başlığı gerektirmez. Godot WebAssembly motoru ayrıca indirilir; bu boyut oyun çizimleriyle karıştırılmamalıdır. Motor 39.514.754 bayt; gzip aktarımı 10.054.758 bayttır. GitHub Pages özel sıkıştırma başlıkları sunmadığından modern tarayıcılarda DecompressionStream kullanılarak sıkıştırılmış motor akış hâlinde açılır ve WebAssembly derlemesine verilir. Bu API olmayan eski tarayıcılarda standart WASM dosyasına dönülür. Oyun PCK paketi yaklaşık 400 KB. PCK hash'i tarayıcı önbellek anahtarıdır; yeni sürümde eski oyun verisi gelmez, aynı motor dosyası tekrar kullanılır.
 
 ## İngilizceye hazırlık
 

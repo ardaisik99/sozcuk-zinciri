@@ -1,26 +1,654 @@
 [
-{"id":1,"category":"Mutfak","words":["ÇAY","KAŞIK","OYUN","HAVA"],"links":["Çay kaşığı","Kaşık oyunu","Oyun havası"],"hints":["","Karıştırmak için kullanılan küçük mutfak gereci.","Eğlenmek için kurallarla yapılan etkinlik.","Bir ezginin, melodinin diğer adı."]},
-{"id":2,"category":"Mutfak","words":["KAHVE","FİNCAN","TAKIM","ELBİSE"],"links":["Kahve fincanı","Fincan takımı","Takım elbise"],"hints":["","Kahvenin küçük, kulplu dostu.","Birbirini tamamlayan eşyaların bütünü.","Ceket ve pantolonla bir bütün oluşturan giysi."]},
-{"id":3,"category":"Mutfak","words":["YEMEK","MASA","TENİS","TOP"],"links":["Yemek masası","Masa tenisi","Tenis topu"],"hints":["","Üzerinde yemek yediğimiz mobilya.","Raketle oynanan bir spor.","Oyunlarda kullanılan yuvarlak nesne."]},
-{"id":4,"category":"Mutfak","words":["SU","ŞİŞE","KAPAK","RESİM"],"links":["Su şişesi","Şişe kapağı","Kapak resmi"],"hints":["","İçecekleri saklayan dar ağızlı kap.","Bir kabın ağzını örten parça.","Bir şeyi çizgiler ve renklerle anlatan görüntü."]},
-{"id":5,"category":"Mutfak","words":["EKMEK","BIÇAK","SIRT","ÇANTA"],"links":["Ekmek bıçağı","Bıçak sırtı","Sırt çantası"],"hints":["","Dilimlemeye yarayan keskin mutfak gereci.","Kesici ağzın karşısındaki kalın bölüm; bedenin arkası.","Eşyaları taşımaya yarayan, sırta da takılabilen eşya."]},
-{"id":6,"category":"Mutfak","words":["MEYVE","SU","RENK","TON"],"links":["Meyve suyu","Su rengi","Renk tonu"],"hints":["","İçtiğimiz saydam sıvı.","Sarı, mor, turuncu gibi görsel özellik.","Bir rengin açık ya da koyu derecesi."]},
-{"id":7,"category":"Mutfak","words":["SÜT","TOZ","ŞEKER","PANCAR"],"links":["Süt tozu","Toz şeker","Şeker pancarı"],"hints":["","Çok küçük, kuru parçacıklar.","Yiyeceklere tatlılık katan madde.","Şeker üretiminde kullanılan bir kök bitkisi."]},
-{"id":8,"category":"Mutfak","words":["BALIK","ÇORBA","KAŞIK","OYUN"],"links":["Balık çorbası","Çorba kaşığı","Kaşık oyunu"],"hints":["","Genellikle sıcak içilen, sulu yemek.","Sulu yemekleri yemeye yarayan gereç.","Kaşıklarla ritim tutularak da yapılan eğlenceli etkinlik."]},
-{"id":9,"category":"Doğa","words":["DENİZ","YILDIZ","TOZ","BULUT"],"links":["Deniz yıldızı","Yıldız tozu","Toz bulutu"],"hints":["","Gökyüzünde parıldar; denizde beş kollu bir canlıya ad olur.","Çok küçük, uçuşabilen parçacıklar.","Gökyüzünde kümelenen su damlacıkları."]},
-{"id":10,"category":"Doğa","words":["YAĞMUR","DAMLA","SES","DALGA"],"links":["Yağmur damlası","Damla sesi","Ses dalgası"],"hints":["","Sıvının küçücük, yuvarlak tanesi.","Kulağımızla algıladığımız titreşim.","Suda ya da havada yayılan titreşim."]},
-{"id":11,"category":"Doğa","words":["ÇAM","AĞAÇ","KABUK","BÖCEK"],"links":["Çam ağacı","Ağaç kabuğu","Kabuk böceği"],"hints":["","Gövdesi odunsu, dallı büyük bitki.","Gövdeyi ya da meyveyi dıştan saran örtü.","Altı bacaklı küçük hayvan."]},
-{"id":12,"category":"Doğa","words":["GÜL","BAHÇE","KAPI","KOL"],"links":["Gül bahçesi","Bahçe kapısı","Kapı kolu"],"hints":["","Çiçek ve sebze yetiştirilen alan.","Bir yere girip çıkmayı sağlayan açılır kapanır bölüm.","Kapıyı açarken tuttuğumuz parça."]},
-{"id":13,"category":"Doğa","words":["GÜNEŞ","IŞIK","HIZ","SINIR"],"links":["Güneş ışığı","Işık hızı","Hız sınırı"],"hints":["","Çevremizi görmemizi sağlayan aydınlık.","Bir şeyin ne kadar çabuk hareket ettiğinin ölçüsü.","Aşılmaması gereken çizgi veya değer."]},
-{"id":14,"category":"Doğa","words":["KAR","TOP","OYUN","ALAN"],"links":["Kar topu","Top oyunu","Oyun alanı"],"hints":["","Yuvarlanmış karın aldığı biçim; yuvarlak oyun nesnesi.","Eğlenmek için yapılan kurallı etkinlik.","Belirli bir amaç için ayrılan yer."]},
-{"id":15,"category":"Doğa","words":["KAYA","TUZ","GÖL","SU"],"links":["Kaya tuzu","Tuz gölü","Göl suyu"],"hints":["","Yemeklere tat veren beyaz mineral.","Karalarla çevrili büyük su birikintisi.","Gölleri ve denizleri dolduran sıvı."]},
-{"id":16,"category":"Doğa","words":["ÇİÇEK","BAL","ARI","KOVAN"],"links":["Çiçek balı","Bal arısı","Arı kovanı"],"hints":["","Arıların yaptığı tatlı besin.","Çiçeklerden nektar toplayan kanatlı böcek.","Arıların yaşadığı ve bal yaptığı yuva."]},
-{"id":17,"category":"Günlük Yaşam","words":["OKUL","ÇANTA","FERMUAR","DİŞ"],"links":["Okul çantası","Çanta fermuarı","Fermuar dişi"],"hints":["","Kitap ve defterleri taşıdığımız eşya.","İki kenarı küçük parçalarla birleştiren kapatma düzeneği.","Ağzımızda da bulunan, fermuarda sırayla dizilen küçük parça."]},
-{"id":18,"category":"Günlük Yaşam","words":["KİTAP","SAYFA","NUMARA","LEVHA"],"links":["Kitap sayfası","Sayfa numarası","Numara levhası"],"hints":["","Kitabın her bir yaprak yüzü.","Sıralamayı veya kimliği belirten sayı.","Üzerinde yazı ya da işaret bulunan düz yüzey."]},
-{"id":19,"category":"Günlük Yaşam","words":["EV","KAPI","ZİL","SES"],"links":["Ev kapısı","Kapı zili","Zil sesi"],"hints":["","Eve girerken açtığımız bölüm.","Misafir gelince basılan sesli düzenek.","Kulağımızla duyduğumuz şey."]},
-{"id":20,"category":"Günlük Yaşam","words":["EL","SAAT","KULE","KAPI"],"links":["El saati","Saat kulesi","Kule kapısı"],"hints":["","Zamanı gösteren araç.","Çevresine göre oldukça yüksek yapı.","Bir yapının girişindeki açılır kapanır bölüm."]},
-{"id":21,"category":"Günlük Yaşam","words":["YOL","HARİTA","BİLGİ","SİSTEM"],"links":["Yol haritası","Harita bilgisi","Bilgi sistemi"],"hints":["","Yolları ve yerleri çizimle gösterir.","Öğrenerek elde ettiğimiz şey.","Birbiriyle bağlantılı parçaların oluşturduğu düzen."]},
-{"id":22,"category":"Günlük Yaşam","words":["OTOBÜS","DURAK","TABELA","YAZI"],"links":["Otobüs durağı","Durak tabelası","Tabela yazısı"],"hints":["","Toplu taşıtların yolcu aldığı yer.","Bir yeri veya yönü belirten yazılı levha.","Düşüncelerin harflerle anlatımı."]},
-{"id":23,"category":"Günlük Yaşam","words":["CEP","TELEFON","REHBER","KİTAP"],"links":["Cep telefonu","Telefon rehberi","Rehber kitap"],"hints":["","Uzaktaki biriyle konuşmamızı sağlayan cihaz.","Kişileri listeler ya da bize yol gösterir.","Sayfalardan oluşan okuma kaynağı."]},
-{"id":24,"category":"Günlük Yaşam","words":["MASA","LAMBA","IŞIK","HIZ","SINIR"],"links":["Masa lambası","Lamba ışığı","Işık hızı","Hız sınırı"],"hints":["","Çalışırken masamızı aydınlatan araç.","Görmemizi sağlayan aydınlık.","Birim zamanda alınan yolun ölçüsü.","Bir şeyin ulaşabileceği en son çizgi."]}
+  {
+    "id": 1,
+    "category": "Mutfak",
+    "words": [
+      "SU",
+      "BARDAK",
+      "ALTLIK",
+      "KUMAŞ"
+    ],
+    "links": [
+      "Su bardağı",
+      "Bardak altlığı",
+      "Altlık kumaşı"
+    ],
+    "hints": [
+      "",
+      "Su içerken kullandığın cam kap.",
+      "Bardağın altında masayı koruyan küçük parça.",
+      "Giysi veya örtü yapımında kullanılan dokuma."
+    ],
+    "forms": [
+      "SU",
+      "BARDAĞI",
+      "ALTLIĞI",
+      "KUMAŞI"
+    ]
+  },
+  {
+    "id": 2,
+    "category": "Mutfak",
+    "words": [
+      "KAHVE",
+      "FİNCAN",
+      "TAKIM",
+      "ELBİSE"
+    ],
+    "links": [
+      "Kahve fincanı",
+      "Fincan takımı",
+      "Takım elbise"
+    ],
+    "hints": [
+      "",
+      "Kahvenin küçük, kulplu dostu.",
+      "Birbirini tamamlayan eşyaların bütünü.",
+      "Ceket ve pantolonla bir bütün oluşturan giysi."
+    ],
+    "forms": [
+      "KAHVE",
+      "FİNCANI",
+      "TAKIMI",
+      "ELBİSE"
+    ]
+  },
+  {
+    "id": 3,
+    "category": "Mutfak",
+    "words": [
+      "YEMEK",
+      "MASA",
+      "TENİS",
+      "TOP"
+    ],
+    "links": [
+      "Yemek masası",
+      "Masa tenisi",
+      "Tenis topu"
+    ],
+    "hints": [
+      "",
+      "Üzerinde yemek yediğimiz mobilya.",
+      "Raketle oynanan bir spor.",
+      "Oyunlarda kullanılan yuvarlak nesne."
+    ],
+    "forms": [
+      "YEMEK",
+      "MASASI",
+      "TENİSİ",
+      "TOPU"
+    ]
+  },
+  {
+    "id": 4,
+    "category": "Mutfak",
+    "words": [
+      "SU",
+      "ŞİŞE",
+      "KAPAK",
+      "RESİM"
+    ],
+    "links": [
+      "Su şişesi",
+      "Şişe kapağı",
+      "Kapak resmi"
+    ],
+    "hints": [
+      "",
+      "İçecekleri saklayan dar ağızlı kap.",
+      "Bir kabın ağzını örten parça.",
+      "Bir şeyi çizgiler ve renklerle anlatan görüntü."
+    ],
+    "forms": [
+      "SU",
+      "ŞİŞESİ",
+      "KAPAĞI",
+      "RESMİ"
+    ]
+  },
+  {
+    "id": 5,
+    "category": "Mutfak",
+    "words": [
+      "EKMEK",
+      "BIÇAK",
+      "SIRT",
+      "ÇANTA"
+    ],
+    "links": [
+      "Ekmek bıçağı",
+      "Bıçak sırtı",
+      "Sırt çantası"
+    ],
+    "hints": [
+      "",
+      "Dilimlemeye yarayan keskin mutfak gereci.",
+      "Kesici ağzın karşısındaki kalın bölüm; bedenin arkası.",
+      "Eşyaları taşımaya yarayan, sırta da takılabilen eşya."
+    ],
+    "forms": [
+      "EKMEK",
+      "BIÇAĞI",
+      "SIRTI",
+      "ÇANTASI"
+    ]
+  },
+  {
+    "id": 6,
+    "category": "Mutfak",
+    "words": [
+      "MEYVE",
+      "SU",
+      "RENK",
+      "TON"
+    ],
+    "links": [
+      "Meyve suyu",
+      "Su rengi",
+      "Renk tonu"
+    ],
+    "hints": [
+      "",
+      "İçtiğimiz saydam sıvı.",
+      "Sarı, mor, turuncu gibi görsel özellik.",
+      "Bir rengin açık ya da koyu derecesi."
+    ],
+    "forms": [
+      "MEYVE",
+      "SUYU",
+      "RENGİ",
+      "TONU"
+    ]
+  },
+  {
+    "id": 7,
+    "category": "Mutfak",
+    "words": [
+      "SÜT",
+      "TOZ",
+      "ŞEKER",
+      "PANCAR"
+    ],
+    "links": [
+      "Süt tozu",
+      "Toz şeker",
+      "Şeker pancarı"
+    ],
+    "hints": [
+      "",
+      "Çok küçük, kuru parçacıklar.",
+      "Yiyeceklere tatlılık katan madde.",
+      "Şeker üretiminde kullanılan bir kök bitkisi."
+    ],
+    "forms": [
+      "SÜT",
+      "TOZU",
+      "ŞEKER",
+      "PANCARI"
+    ]
+  },
+  {
+    "id": 8,
+    "category": "Mutfak",
+    "words": [
+      "BALIK",
+      "ÇORBA",
+      "KAŞIK",
+      "OYUN"
+    ],
+    "links": [
+      "Balık çorbası",
+      "Çorba kaşığı",
+      "Kaşık oyunu"
+    ],
+    "hints": [
+      "",
+      "Genellikle sıcak içilen, sulu yemek.",
+      "Sulu yemekleri yemeye yarayan gereç.",
+      "Kaşıklarla ritim tutularak da yapılan eğlenceli etkinlik."
+    ],
+    "forms": [
+      "BALIK",
+      "ÇORBASI",
+      "KAŞIĞI",
+      "OYUNU"
+    ]
+  },
+  {
+    "id": 9,
+    "category": "Doğa",
+    "words": [
+      "DENİZ",
+      "YILDIZ",
+      "TOZ",
+      "BULUT"
+    ],
+    "links": [
+      "Deniz yıldızı",
+      "Yıldız tozu",
+      "Toz bulutu"
+    ],
+    "hints": [
+      "",
+      "Gökyüzünde parıldar; denizde beş kollu bir canlıya ad olur.",
+      "Çok küçük, uçuşabilen parçacıklar.",
+      "Gökyüzünde kümelenen su damlacıkları."
+    ],
+    "forms": [
+      "DENİZ",
+      "YILDIZI",
+      "TOZU",
+      "BULUTU"
+    ]
+  },
+  {
+    "id": 10,
+    "category": "Doğa",
+    "words": [
+      "YAĞMUR",
+      "DAMLA",
+      "SES",
+      "DALGA"
+    ],
+    "links": [
+      "Yağmur damlası",
+      "Damla sesi",
+      "Ses dalgası"
+    ],
+    "hints": [
+      "",
+      "Sıvının küçücük, yuvarlak tanesi.",
+      "Kulağımızla algıladığımız titreşim.",
+      "Suda ya da havada yayılan titreşim."
+    ],
+    "forms": [
+      "YAĞMUR",
+      "DAMLASI",
+      "SESİ",
+      "DALGASI"
+    ]
+  },
+  {
+    "id": 11,
+    "category": "Doğa",
+    "words": [
+      "ÇAM",
+      "AĞAÇ",
+      "KABUK",
+      "BÖCEK"
+    ],
+    "links": [
+      "Çam ağacı",
+      "Ağaç kabuğu",
+      "Kabuk böceği"
+    ],
+    "hints": [
+      "",
+      "Gövdesi odunsu, dallı büyük bitki.",
+      "Gövdeyi ya da meyveyi dıştan saran örtü.",
+      "Altı bacaklı küçük hayvan."
+    ],
+    "forms": [
+      "ÇAM",
+      "AĞACI",
+      "KABUĞU",
+      "BÖCEĞİ"
+    ]
+  },
+  {
+    "id": 12,
+    "category": "Doğa",
+    "words": [
+      "GÜL",
+      "BAHÇE",
+      "KAPI",
+      "KOL"
+    ],
+    "links": [
+      "Gül bahçesi",
+      "Bahçe kapısı",
+      "Kapı kolu"
+    ],
+    "hints": [
+      "",
+      "Çiçek ve sebze yetiştirilen alan.",
+      "Bir yere girip çıkmayı sağlayan açılır kapanır bölüm.",
+      "Kapıyı açarken tuttuğumuz parça."
+    ],
+    "forms": [
+      "GÜL",
+      "BAHÇESİ",
+      "KAPISI",
+      "KOLU"
+    ]
+  },
+  {
+    "id": 13,
+    "category": "Doğa",
+    "words": [
+      "GÜNEŞ",
+      "IŞIK",
+      "HIZ",
+      "SINIR"
+    ],
+    "links": [
+      "Güneş ışığı",
+      "Işık hızı",
+      "Hız sınırı"
+    ],
+    "hints": [
+      "",
+      "Çevremizi görmemizi sağlayan aydınlık.",
+      "Bir şeyin ne kadar çabuk hareket ettiğinin ölçüsü.",
+      "Aşılmaması gereken çizgi veya değer."
+    ],
+    "forms": [
+      "GÜNEŞ",
+      "IŞIĞI",
+      "HIZI",
+      "SINIRI"
+    ]
+  },
+  {
+    "id": 14,
+    "category": "Doğa",
+    "words": [
+      "KAR",
+      "TOP",
+      "OYUN",
+      "ALAN"
+    ],
+    "links": [
+      "Kar topu",
+      "Top oyunu",
+      "Oyun alanı"
+    ],
+    "hints": [
+      "",
+      "Yuvarlanmış karın aldığı biçim; yuvarlak oyun nesnesi.",
+      "Eğlenmek için yapılan kurallı etkinlik.",
+      "Belirli bir amaç için ayrılan yer."
+    ],
+    "forms": [
+      "KAR",
+      "TOPU",
+      "OYUNU",
+      "ALANI"
+    ]
+  },
+  {
+    "id": 15,
+    "category": "Doğa",
+    "words": [
+      "KAYA",
+      "TUZ",
+      "GÖL",
+      "SU"
+    ],
+    "links": [
+      "Kaya tuzu",
+      "Tuz gölü",
+      "Göl suyu"
+    ],
+    "hints": [
+      "",
+      "Yemeklere tat veren beyaz mineral.",
+      "Karalarla çevrili büyük su birikintisi.",
+      "Gölleri ve denizleri dolduran sıvı."
+    ],
+    "forms": [
+      "KAYA",
+      "TUZU",
+      "GÖLÜ",
+      "SUYU"
+    ]
+  },
+  {
+    "id": 16,
+    "category": "Doğa",
+    "words": [
+      "ÇİÇEK",
+      "BAL",
+      "ARI",
+      "KOVAN"
+    ],
+    "links": [
+      "Çiçek balı",
+      "Bal arısı",
+      "Arı kovanı"
+    ],
+    "hints": [
+      "",
+      "Arıların yaptığı tatlı besin.",
+      "Çiçeklerden nektar toplayan kanatlı böcek.",
+      "Arıların yaşadığı ve bal yaptığı yuva."
+    ],
+    "forms": [
+      "ÇİÇEK",
+      "BALI",
+      "ARISI",
+      "KOVANI"
+    ]
+  },
+  {
+    "id": 17,
+    "category": "Günlük Yaşam",
+    "words": [
+      "OKUL",
+      "ÇANTA",
+      "FERMUAR",
+      "DİŞ"
+    ],
+    "links": [
+      "Okul çantası",
+      "Çanta fermuarı",
+      "Fermuar dişi"
+    ],
+    "hints": [
+      "",
+      "Kitap ve defterleri taşıdığımız eşya.",
+      "İki kenarı küçük parçalarla birleştiren kapatma düzeneği.",
+      "Ağzımızda da bulunan, fermuarda sırayla dizilen küçük parça."
+    ],
+    "forms": [
+      "OKUL",
+      "ÇANTASI",
+      "FERMUARI",
+      "DİŞİ"
+    ]
+  },
+  {
+    "id": 18,
+    "category": "Günlük Yaşam",
+    "words": [
+      "KİTAP",
+      "SAYFA",
+      "NUMARA",
+      "LEVHA"
+    ],
+    "links": [
+      "Kitap sayfası",
+      "Sayfa numarası",
+      "Numara levhası"
+    ],
+    "hints": [
+      "",
+      "Kitabın her bir yaprak yüzü.",
+      "Sıralamayı veya kimliği belirten sayı.",
+      "Üzerinde yazı ya da işaret bulunan düz yüzey."
+    ],
+    "forms": [
+      "KİTAP",
+      "SAYFASI",
+      "NUMARASI",
+      "LEVHASI"
+    ]
+  },
+  {
+    "id": 19,
+    "category": "Günlük Yaşam",
+    "words": [
+      "EV",
+      "KAPI",
+      "ZİL",
+      "SES"
+    ],
+    "links": [
+      "Ev kapısı",
+      "Kapı zili",
+      "Zil sesi"
+    ],
+    "hints": [
+      "",
+      "Eve girerken açtığımız bölüm.",
+      "Misafir gelince basılan sesli düzenek.",
+      "Kulağımızla duyduğumuz şey."
+    ],
+    "forms": [
+      "EV",
+      "KAPISI",
+      "ZİLİ",
+      "SESİ"
+    ]
+  },
+  {
+    "id": 20,
+    "category": "Günlük Yaşam",
+    "words": [
+      "EL",
+      "SAAT",
+      "KULE",
+      "KAPI"
+    ],
+    "links": [
+      "El saati",
+      "Saat kulesi",
+      "Kule kapısı"
+    ],
+    "hints": [
+      "",
+      "Zamanı gösteren araç.",
+      "Çevresine göre oldukça yüksek yapı.",
+      "Bir yapının girişindeki açılır kapanır bölüm."
+    ],
+    "forms": [
+      "EL",
+      "SAATİ",
+      "KULESİ",
+      "KAPISI"
+    ]
+  },
+  {
+    "id": 21,
+    "category": "Günlük Yaşam",
+    "words": [
+      "YOL",
+      "HARİTA",
+      "BİLGİ",
+      "SİSTEM"
+    ],
+    "links": [
+      "Yol haritası",
+      "Harita bilgisi",
+      "Bilgi sistemi"
+    ],
+    "hints": [
+      "",
+      "Yolları ve yerleri çizimle gösterir.",
+      "Öğrenerek elde ettiğimiz şey.",
+      "Birbiriyle bağlantılı parçaların oluşturduğu düzen."
+    ],
+    "forms": [
+      "YOL",
+      "HARİTASI",
+      "BİLGİSİ",
+      "SİSTEMİ"
+    ]
+  },
+  {
+    "id": 22,
+    "category": "Günlük Yaşam",
+    "words": [
+      "OTOBÜS",
+      "DURAK",
+      "TABELA",
+      "YAZI"
+    ],
+    "links": [
+      "Otobüs durağı",
+      "Durak tabelası",
+      "Tabela yazısı"
+    ],
+    "hints": [
+      "",
+      "Toplu taşıtların yolcu aldığı yer.",
+      "Bir yeri veya yönü belirten yazılı levha.",
+      "Düşüncelerin harflerle anlatımı."
+    ],
+    "forms": [
+      "OTOBÜS",
+      "DURAĞI",
+      "TABELASI",
+      "YAZISI"
+    ]
+  },
+  {
+    "id": 23,
+    "category": "Günlük Yaşam",
+    "words": [
+      "CEP",
+      "TELEFON",
+      "REHBER",
+      "KİTAP"
+    ],
+    "links": [
+      "Cep telefonu",
+      "Telefon rehberi",
+      "Rehber kitap"
+    ],
+    "hints": [
+      "",
+      "Uzaktaki biriyle konuşmamızı sağlayan cihaz.",
+      "Kişileri listeler ya da bize yol gösterir.",
+      "Sayfalardan oluşan okuma kaynağı."
+    ],
+    "forms": [
+      "CEP",
+      "TELEFONU",
+      "REHBERİ",
+      "KİTAP"
+    ]
+  },
+  {
+    "id": 24,
+    "category": "Günlük Yaşam",
+    "words": [
+      "MASA",
+      "LAMBA",
+      "IŞIK",
+      "HIZ",
+      "SINIR"
+    ],
+    "links": [
+      "Masa lambası",
+      "Lamba ışığı",
+      "Işık hızı",
+      "Hız sınırı"
+    ],
+    "hints": [
+      "",
+      "Çalışırken masamızı aydınlatan araç.",
+      "Görmemizi sağlayan aydınlık.",
+      "Birim zamanda alınan yolun ölçüsü.",
+      "Bir şeyin ulaşabileceği en son çizgi."
+    ],
+    "forms": [
+      "MASA",
+      "LAMBASI",
+      "IŞIĞI",
+      "HIZI",
+      "SINIRI"
+    ]
+  }
 ]

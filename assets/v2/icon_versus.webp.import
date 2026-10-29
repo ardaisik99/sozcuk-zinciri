@@ -2,22 +2,22 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bfxjcx5g2xtdi"
-path="res://.godot/imported/book.webp-1bf473b607f31accbd3f36da04700e64.ctex"
+uid="uid://cuxio5xbfm3bv"
+path="res://.godot/imported/icon_versus.webp-0bd04253457fb439f674a8915bdef78f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/book.webp"
-dest_files=["res://.godot/imported/book.webp-1bf473b607f31accbd3f36da04700e64.ctex"]
+source_file="res://assets/v2/icon_versus.webp"
+dest_files=["res://.godot/imported/icon_versus.webp-0bd04253457fb439f674a8915bdef78f.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.88
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
